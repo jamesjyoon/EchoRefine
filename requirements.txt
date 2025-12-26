@@ -1,0 +1,31 @@
+# Core ML Frameworks
+torch>=2.3.0
+torchvision
+torchaudio
+
+# Hugging Face Suite (Versions required for Llama-3.1)
+transformers>=4.43.0
+datasets>=2.20.0
+tokenizers>=0.19.0
+accelerate>=0.33.0
+peft>=0.12.0
+trl>=0.9.6
+
+# Quantization & Efficiency
+bitsandbytes>=0.43.0
+scipy
+sentencepiece
+
+# Machine Translation Metrics
+sacrebleu>=2.4.0
+unbabel-comet>=2.2.0
+evaluate>=0.4.0
+bert-score>=0.3.13
+
+# Utilities
+sentence-transformers
+pandas
+numpy
+matplotlib
+python-dotenv
+tqdm
