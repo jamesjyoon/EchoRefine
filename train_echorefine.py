@@ -13,7 +13,7 @@ from transformers import (
 )
 from transformers.trainer_utils import get_last_checkpoint
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer
+from trl import SFTTrainer, SFTConfig
 
 # 1. Config
 MODEL_ID = "meta-llama/Llama-3.1-70B-Instruct"
@@ -120,17 +120,18 @@ trainer = SFTTrainer(
     train_dataset=load_dataset("csv", data_files=TRAIN_DATA_PATH, split="train"),
     peft_config=peft_config,
     formatting_func=formatting_func,
-    max_seq_length=512,
-    args=TrainingArguments(
+    args=SFTConfig(
         output_dir=OUTPUT_DIR,
+        dataset_text_field=None, # We use formatting_func
+        max_seq_length=512,
         per_device_train_batch_size=1,
         gradient_accumulation_steps=8,
         max_steps=1000, 
         learning_rate=2e-4,
         fp16=True,
         logging_steps=10,
-        save_steps=100,            # Save every 100 steps
-        save_total_limit=2,        # Don't fill up cluster storage
+        save_steps=100,
+        save_total_limit=2,
         optim="paged_adamw_8bit",
         resume_from_checkpoint=last_checkpoint
     ),
