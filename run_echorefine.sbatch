@@ -4,10 +4,11 @@
 #SBATCH -N 1                             # Number of nodes
 #SBATCH --gres=gpu:A100:2                # Request 2x A100 GPUs
 #SBATCH --mem=192G                       # CPU RAM (70B model loading needs high RAM)
-#SBATCH -t 12:00:00                      # 12 hours limit (Train ~6h, Eval ~2h)
+#SBATCH -t 08:00:00                      # 8 hours limit (Train ~6h, Eval ~2h)
 #SBATCH -q coc-ice                       # QOS (based on your logs)
 #SBATCH -o logs/%j.out                   # Standard output log
 #SBATCH -e logs/%j.err                   # Standard error log
+#SBATCH --cpus-per-task=8
 
 # --- 1. Environment Setup ---
 module load anaconda3
