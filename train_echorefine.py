@@ -120,10 +120,10 @@ trainer = SFTTrainer(
     train_dataset=load_dataset("csv", data_files=TRAIN_DATA_PATH, split="train"),
     peft_config=peft_config,
     formatting_func=formatting_func,
+    max_seq_length=512,
     args=SFTConfig(
         output_dir=OUTPUT_DIR,
         dataset_text_field=None, # We use formatting_func
-        max_seq_length=512,
         per_device_train_batch_size=1,
         gradient_accumulation_steps=8,
         max_steps=1000, 
