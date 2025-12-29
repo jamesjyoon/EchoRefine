@@ -115,37 +115,7 @@ def formatting_func(example):
         for s, d, b, t in zip(example['source'], example['draft'], example['back_trans'], example['target'])
     ]
 
-This error, combined with your previous error, suggests that you are caught between two different versions of the trl library. In the latest versions (0.9.0+), the library moved these parameters into a dedicated SFTConfig class, but it can be very picky about where they are placed.
-
-To fix this once and for all on the PACE cluster, please follow these steps:
-
-Step 1: Force Update the Library
-
-Run this in your terminal (while your conda environment is active) to ensure you are on the most modern version that Llama-3.1-70B requires:
-
-code
-Bash
-download
-content_copy
-expand_less
-pip install trl --upgrade
-Step 2: Update the Python Code
-
-The most current way to handle this is to put max_seq_length inside the SFTConfig and ensure you are not passing it to the SFTTrainer directly.
-
-Update your train_echorefine.py script to match this exact structure:
-
-code
-Python
-download
-content_copy
-expand_less
-from trl import SFTTrainer, SFTConfig  # Ensure SFTConfig is imported
-
-# ... (Previous code remains the same) ...
-
 # 9. Training Configuration
-# In modern TRL, max_seq_length MUST be inside SFTConfig
 training_args = SFTConfig(
     output_dir=OUTPUT_DIR,
     max_seq_length=512,            # Put it HERE
