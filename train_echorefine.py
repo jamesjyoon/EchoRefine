@@ -13,7 +13,7 @@ from transformers import (
 )
 from transformers.trainer_utils import get_last_checkpoint
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer, SFTConfig
+from trl import SFTTrainer
 
 # 1. Config
 MODEL_ID = "meta-llama/Llama-3.1-70B-Instruct"
@@ -115,10 +115,10 @@ def formatting_func(example):
         for s, d, b, t in zip(example['source'], example['draft'], example['back_trans'], example['target'])
     ]
 
-# 9. Training Configuration
-training_args = SFTConfig(
+# 9. Training Configuration (LTS Stable Version)
+# We use standard TrainingArguments which is compatible with all TRL versions
+training_args = TrainingArguments(
     output_dir=OUTPUT_DIR,
-    max_seq_length=512,            # Put it HERE
     per_device_train_batch_size=1,
     gradient_accumulation_steps=8,
     max_steps=1000, 
@@ -128,22 +128,25 @@ training_args = SFTConfig(
     save_steps=100,            
     save_total_limit=2,        
     optim="paged_adamw_8bit",
-    dataset_text_field="unused",   # SFTTrainer requires this or a formatting_func
-    packing=False
+    remove_unused_columns=False, # Important for SFTTrainer
+    push_to_hub=False,
+    report_to="none"             # Prevents errors if WandB isn't set up
 )
 
+# Initialize the Trainer
 trainer = SFTTrainer(
     model=model,
     train_dataset=load_dataset("csv", data_files=TRAIN_DATA_PATH, split="train"),
     peft_config=peft_config,
     formatting_func=formatting_func,
-    args=training_args,            # Pass the config object here
-    # DO NOT put max_seq_length here
+    max_seq_length=512,         # This is an argument of SFTTrainer, NOT TrainingArguments
+    args=training_args,         # Pass the standard config here
 )
 
 # 10. Start Training
+print(">>> Starting Fine-Tuning...")
 trainer.train(resume_from_checkpoint=last_checkpoint)
 
-# Final Save
+# 11. Final Save
 model.save_pretrained(OUTPUT_DIR)
 print(f"Training finished. Final model saved to {OUTPUT_DIR}")
