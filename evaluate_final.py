@@ -33,11 +33,20 @@ TGT_ISO = "npi"
 TGT_MBART = "ne_NP"
 LANG_NAME = "Nepali"
 
+# Use an absolute path to avoid PEFT validation errors
+PROJECT_ROOT = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine"
+ADAPTER_PATH = os.path.join(PROJECT_ROOT, "llama-70b-nepali-refined")
+   
 # -----------------------------
 # 1. Load Models & Metrics
 # -----------------------------
 class EchoRefineEvaluator:
     def __init__(self):
+
+        if not os.path.exists(os.path.join(ADAPTER_PATH, "adapter_config.json")):
+            print(f"CRITICAL: Adapter not found at {ADAPTER_PATH}. Did training finish?")
+            return # or exit
+            
         print(">>> Loading Metrics...")
         self.chrf = evaluate.load("chrf")
         self.comet = evaluate.load("comet", "Unbabel/wmt22-comet-da")
