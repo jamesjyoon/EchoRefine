@@ -7,32 +7,40 @@
 #SBATCH -t 04:00:00
 #SBATCH --cpus-per-task=8
 #SBATCH -q coc-ice
-#SBATCH -o logs/%j.out
-#SBATCH -e logs/%j.err
+#SBATCH -o /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/logs/%j.out
+#SBATCH -e /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/logs/%j.err
 
-# --- 1. Environment Setup ---
+# --- 1. Define Absolute Paths ---
+PROJECT_DIR="/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine"
+PYTHON_BIN="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
+CACHE_DIR="/storage/ice1/6/3/jyoon370/hf_cache"
+
+# --- 2. Environment Setup ---
 module load cuda/12.1
-PYTHON_PATH="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
-
-# Force ALL caches and temp files to the LARGE storage area
-export HF_HOME="/storage/ice1/6/3/jyoon370/hf_cache"
+export HF_HOME="$CACHE_DIR"
 export TMPDIR="/storage/ice1/6/3/jyoon370/tmp"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
 export TOKENIZERS_PARALLELISM=false
 
-mkdir -p $HF_HOME $TMPDIR logs
+# Ensure directories exist before starting
+mkdir -p "$PROJECT_DIR/logs" "$TMPDIR" "$HF_HOME"
 
-cd /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine
+# Move into the project directory
+cd "$PROJECT_DIR"
 
-# --- 2. Run Pipeline ---
-echo "Starting Stage 1: Fine-Tuning..."
-$PYTHON_PATH train_echorefine.py
+# --- 3. Run Pipeline ---
+echo "Job started on $(hostname) at $(date)"
+echo "Working directory: $(pwd)"
+
+echo ">>> Starting Stage 1: Fine-Tuning..."
+$PYTHON_BIN train_echorefine.py
 
 if [ $? -eq 0 ]; then
-    echo "Fine-tuning successful. Starting Stage 2: Evaluation..."
-    $PYTHON_PATH evaluate_final.py
+    echo ">>> Training successful. Starting Stage 2: Evaluation..."
+    $PYTHON_BIN evaluate_final.py
 else
-    echo "Training failed. Check logs/%j.err"
+    echo ">>> Training failed! check the .err file."
     exit 1
 fi
 
+echo "Job finished at $(date)"
