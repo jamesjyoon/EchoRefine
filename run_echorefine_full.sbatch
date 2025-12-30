@@ -30,8 +30,4 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
 echo "Running job on $(hostname)"
 echo "Using Python from: $PYTHON_PATH"
 
-# Run the training script
-$PYTHON_PATH train_echorefine.py
-
-# Run the evaluation script
-$PYTHON_PATH evaluate_final.py
+$PYTHON_PATH train_echorefine.py && $PYTHON_PATH evaluate_final.py
