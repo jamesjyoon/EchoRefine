@@ -1,73 +1,181 @@
 import os
 import torch
-import matplotlib
+import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 from peft import PeftModel
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSeq2SeqLM, BitsAndBytesConfig
-import sacrebleu
+from datasets import load_dataset
 import evaluate
+import sacrebleu
+from transformers import (
+    AutoTokenizer, 
+    AutoModelForCausalLM, 
+    AutoModelForSeq2SeqLM, 
+    BitsAndBytesConfig
+)
 
-# Setup
-matplotlib.use('Agg')
+# --- Cluster Setup ---
+import matplotlib
+matplotlib.use('Agg') 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
+# Configuration
 LLAMA_ID = "meta-llama/Llama-3.1-70B-Instruct"
-ADAPTER_PATH = "./llama-70b-nepali-refined"
+ADAPTER_PATH = "./llama-70b-nepali-refined" # Must match training output dir
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
+HUGGING_FACE_HUB_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
 
-class EchoRefineFinal:
+# Language settings (English to Nepali)
+SRC_ISO = "eng"
+TGT_ISO = "npi"
+TGT_MBART = "ne_NP"
+LANG_NAME = "Nepali"
+
+# -----------------------------
+# 1. Load Models & Metrics
+# -----------------------------
+class EchoRefineEvaluator:
     def __init__(self):
-        # Load Base + Adapter
-        bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
-        base = AutoModelForCausalLM.from_pretrained(LLAMA_ID, quantization_config=bnb, device_map="auto")
-        print("Loading Fine-Tuned Adapter...")
-        self.l_mod = PeftModel.from_pretrained(base, ADAPTER_PATH)
+        print(">>> Loading Metrics...")
+        self.chrf = evaluate.load("chrf")
+        self.comet = evaluate.load("comet", "Unbabel/wmt22-comet-da")
+        
+        print(">>> Loading Base Llama-3.1-70B...")
+        bnb = BitsAndBytesConfig(
+            load_in_4bit=True, bnb_4bit_quant_type="nf4", 
+            bnb_4bit_compute_dtype=torch.float16, bnb_4bit_use_double_quant=True
+        )
+        base_model = AutoModelForCausalLM.from_pretrained(
+            LLAMA_ID, quantization_config=bnb, device_map="auto", token=HUGGING_FACE_HUB_TOKEN
+        )
+        
+        print(f">>> Attaching Adapter from {ADAPTER_PATH}...")
+        self.l_mod = PeftModel.from_pretrained(base_model, ADAPTER_PATH)
         self.l_tok = AutoTokenizer.from_pretrained(LLAMA_ID)
         
-        # Load mBART
-        self.n_mod = AutoModelForSeq2SeqLM.from_pretrained(MBART_ID, torch_dtype=torch.float16, device_map="auto")
+        print(">>> Loading mBART-50...")
         self.n_tok = AutoTokenizer.from_pretrained(MBART_ID)
+        self.n_mod = AutoModelForSeq2SeqLM.from_pretrained(
+            MBART_ID, torch_dtype=torch.float16, device_map="auto"
+        )
 
-    def translate_mbart(self, text):
-        self.n_tok.src_lang = "en_XX"
-        inputs = self.n_tok(text, return_tensors="pt").to(self.n_mod.device)
-        out = self.n_mod.generate(**inputs, forced_bos_token_id=self.n_tok.lang_code_to_id["ne_NP"])
-        return self.n_tok.decode(out[0], skip_special_tokens=True)
+    def mbart_translate(self, text, src_tag, tgt_tag):
+        self.n_tok.src_lang = src_tag
+        inputs = self.n_tok(text, return_tensors="pt", truncation=True).to(self.n_mod.device)
+        outputs = self.n_mod.generate(**inputs, forced_bos_token_id=self.n_tok.lang_code_to_id[tgt_tag])
+        return self.n_tok.decode(outputs[0], skip_special_tokens=True)
 
-    def refine_ft(self, src, draft, bt):
-        prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nSource: {src}\nDraft: {draft}\nBack-trans: {bt}\n\nRESULT:<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+    def refine_ft(self, source, draft, back_trans):
+        # Must match the prompt format used during fine-tuning
+        prompt = (
+            f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
+            f"Source: {source}\nDraft: {draft}\nBack-trans: {back_trans}\n\n"
+            f"RESULT:<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+        )
         inputs = self.l_tok(prompt, return_tensors="pt").to(self.l_mod.device)
-        out = self.l_mod.generate(**inputs, max_new_tokens=150, do_sample=False)
-        return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
+        outputs = self.l_mod.generate(**inputs, max_new_tokens=150, do_sample=False, pad_token_id=self.l_tok.eos_token_id)
+        return self.l_tok.decode(outputs[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
 
-# --- Execution & Graphing ---
-def generate_comparison_graph():
-    # 1. Baseline Scores (Based on your real results)
-    # 2. Predicted Fine-Tuned Scores (Based on literature for Llama-70B QLoRA)
-    data = {
-        'Metric': ['chrF', 'BLEU', 'COMET'],
-        'mBART (Baseline)': [50.00, 6.72, 79.56],
-        'EchoRefine (Zero-Shot)': [51.73, 7.00, 80.69],
-        'EchoRefine (Fine-Tuned)': [62.40, 18.50, 88.20] # Expected jump
-    }
+# -----------------------------
+# 2. Main Evaluation Logic
+# -----------------------------
+def run_evaluation(num_samples=50):
+    evaluator = EchoRefineEvaluator()
     
-    df = pd.DataFrame(data)
-    
-    # Plotting
-    ax = df.plot(x='Metric', kind='bar', figsize=(12, 7), width=0.8, color=['#34495e', '#bdc3c7', '#27ae60'])
-    
-    plt.title("EchoRefine Performance: Impact of Fine-Tuning (English-Nepali)", fontsize=14)
-    plt.ylabel("Score (0-100)", fontsize=12)
-    plt.xticks(rotation=0)
-    plt.grid(axis='y', linestyle='--', alpha=0.6)
-    plt.legend(loc='upper left')
-    
-    # Add values on bars
-    for p in ax.patches:
-        ax.annotate(str(p.get_height()), (p.get_x() + 0.05, p.get_height() + 0.5), fontsize=9)
+    print(">>> Loading FLORES dataset...")
+    dataset = load_dataset("openlanguagedata/flores_plus", split='devtest')
+    df = dataset.to_pandas()
+    src_texts = df[df['iso_639_3'] == SRC_ISO]['text'].tolist()[:num_samples]
+    ref_texts = df[df['iso_639_3'] == TGT_ISO]['text'].tolist()[:num_samples]
 
-    plt.savefig("fine_tuned_impact.png", dpi=300)
-    print("Graph saved as fine_tuned_impact.png")
+    results = {"mBART": [], "EchoRefine_FT": []}
+
+    print(f">>> Running inference on {num_samples} samples...")
+    for i in tqdm(range(num_samples)):
+        src = src_texts[i]
+        
+        # mBART Baseline
+        draft = evaluator.mbart_translate(src, "en_XX", TGT_MBART)
+        
+        # EchoRefine Pipeline
+        back = evaluator.mbart_translate(draft, TGT_MBART, "en_XX")
+        refined = evaluator.refine_with_cot(src, draft, back) # Using the FT model here
+        
+        results["mBART"].append(draft)
+        results["EchoRefine_FT"].append(refined)
+
+    # -----------------------------
+    # 3. Metric Calculation
+    # -----------------------------
+    print(">>> Calculating Final Scores...")
+    final_metrics = {}
+    refs_nested = [[r] for r in ref_texts]
+
+    for key in ["mBART", "EchoRefine_FT"]:
+        preds = results[key]
+        
+        # BLEU (sacrebleu)
+        bleu_score = sacrebleu.corpus_bleu(preds, refs_nested).score
+        
+        # chrF
+        chrf_score = evaluator.chrf.compute(predictions=preds, references=refs_nested)['score']
+        
+        # COMET
+        comet_res = evaluator.comet.compute(predictions=preds, references=ref_texts, sources=src_texts)
+        comet_score = comet_res['mean_score'] * 100
+        
+        final_metrics[key] = {
+            "BLEU": round(bleu_score, 2),
+            "chrF": round(chrf_score, 2),
+            "COMET": round(comet_score, 2)
+        }
+
+    # -----------------------------
+    # 4. Save JSON Results
+    # -----------------------------
+    with open("actual_results.json", "w") as f:
+        json.dump(final_metrics, f, indent=4)
+    print(">>> Actual results saved to actual_results.json")
+
+    # -----------------------------
+    # 5. Generate Bar Chart
+    # -----------------------------
+    labels = ["BLEU", "chrF", "COMET"]
+    mbart_vals = [final_metrics["mBART"][m] for m in labels]
+    echo_vals = [final_metrics["EchoRefine_FT"][m] for m in labels]
+
+    x = np.arange(len(labels))
+    width = 0.35
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    rects1 = ax.bar(x - width/2, mbart_vals, width, label='mBART Baseline', color='#34495e')
+    rects2 = ax.bar(x + width/2, echo_vals, width, label='EchoRefine (Fine-Tuned)', color='#27ae60')
+
+    ax.set_ylabel('Scores')
+    ax.set_title(f'Translation Comparison: English to {LANG_NAME} (N={num_samples})')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+    # Label with heights
+    def autolabel(rects):
+        for rect in rects:
+            height = rect.get_height()
+            ax.annotate(f'{height}',
+                        xy=(rect.get_x() + rect.get_width() / 2, height),
+                        xytext=(0, 3), textcoords="offset points",
+                        ha='center', va='bottom')
+
+    autolabel(rects1)
+    autolabel(rects2)
+
+    plt.tight_layout()
+    plt.savefig('final_evaluation_results.png')
+    print(">>> Bar chart saved as final_evaluation_results.png")
 
 if __name__ == "__main__":
-    generate_comparison_graph()
+    # Ensure you set num_samples to 1012 for the final paper run
+    run_evaluation(num_samples=50)
