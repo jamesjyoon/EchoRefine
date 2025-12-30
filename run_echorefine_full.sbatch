@@ -11,6 +11,16 @@
 #SBATCH -e logs/%j.err
 
 # --- 1. Environment Setup ---
+
+# Force all tools to use Storage
+export HF_HOME="/storage/ice1/6/3/jyoon370/hf_cache"
+export TORCH_HOME="/storage/ice1/6/3/jyoon370/hf_cache/torch"
+export TMPDIR="/storage/ice1/6/3/jyoon370/tmp"
+export PIP_CACHE_DIR="/storage/ice1/6/3/jyoon370/hf_cache/pip"
+
+# Create directories to be safe
+mkdir -p $HF_HOME $TORCH_HOME $TMPDIR $PIP_CACHE_DIR
+
 # Load CUDA so the GPU is visible to torch
 module load cuda/12.1
 
@@ -21,7 +31,6 @@ PYTHON_PATH="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
 # Ensure we are in the correct working directory
 cd /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine
 
-export HF_HOME="/storage/ice1/6/3/jyoon370/hf_cache"
 export TOKENIZERS_PARALLELISM=false
 # This helps 'bitsandbytes' find the CUDA library on PACE
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
