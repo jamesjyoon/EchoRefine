@@ -21,7 +21,7 @@ export HF_HOME="$CACHE_DIR"
 export TMPDIR="/storage/ice1/6/3/jyoon370/tmp"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
 export TOKENIZERS_PARALLELISM=false
-export HF_TOKEN=$(grep HUGGING_FACE_HUB_TOKEN .env | cut -d '=' -f2)
+export HF_TOKEN=$(grep HUGGING_FACE_HUB_TOKEN "$PROJECT_dir/.env" | cut -d '=' -f2)
 export HF_HUB_TOKEN=$HF_TOKEN
 
 # Ensure directories exist before starting
