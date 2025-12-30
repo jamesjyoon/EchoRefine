@@ -23,7 +23,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # Configuration
 LLAMA_ID = "meta-llama/Llama-3.1-70B-Instruct"
-ADAPTER_PATH = "./llama-70b-nepali-refined" # Must match training output dir
+ADAPTER_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-nepali-refined"
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
 HUGGING_FACE_HUB_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
 
