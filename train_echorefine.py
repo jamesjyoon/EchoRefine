@@ -14,6 +14,7 @@ from transformers import (
 from transformers.trainer_utils import get_last_checkpoint
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from trl import SFTTrainer
+import inspect
 
 # 1. Config
 MODEL_ID = "meta-llama/Llama-3.1-70B-Instruct"
@@ -115,8 +116,8 @@ def formatting_func(example):
         for s, d, b, t in zip(example['source'], example['draft'], example['back_trans'], example['target'])
     ]
 
-# 9. Training Configuration (LTS Stable Version)
-# We use standard TrainingArguments which is compatible with all TRL versions
+# 9. Training Configuration
+# We start with the standard TrainingArguments
 training_args = TrainingArguments(
     output_dir=OUTPUT_DIR,
     per_device_train_batch_size=1,
@@ -128,25 +129,45 @@ training_args = TrainingArguments(
     save_steps=100,            
     save_total_limit=2,        
     optim="paged_adamw_8bit",
-    remove_unused_columns=False, # Important for SFTTrainer
-    push_to_hub=False,
-    report_to="none"             # Prevents errors if WandB isn't set up
+    report_to="none",
+    remove_unused_columns=False
 )
 
-# Initialize the Trainer
-trainer = SFTTrainer(
-    model=model,
-    train_dataset=load_dataset("csv", data_files=TRAIN_DATA_PATH, split="train"),
-    peft_config=peft_config,
-    formatting_func=formatting_func,
-    max_seq_length=512,         # This is an argument of SFTTrainer, NOT TrainingArguments
-    args=training_args,         # Pass the standard config here
-)
+# 10. Intelligent Trainer Initialization
+# We check the SFTTrainer signature to see where it wants 'max_seq_length'
+trainer_signature = inspect.signature(SFTTrainer.__init__)
 
-# 10. Start Training
+trainer_kwargs = {
+    "model": model,
+    "train_dataset": load_dataset("csv", data_files=TRAIN_DATA_PATH, split="train"),
+    "peft_config": peft_config,
+    "formatting_func": formatting_func,
+    "args": training_args,
+}
+
+# If the version of SFTTrainer expects max_seq_length as a direct argument:
+if "max_seq_length" in trainer_signature.parameters:
+    print(">>> Version detected: Passing max_seq_length to Trainer")
+    trainer_kwargs["max_seq_length"] = 512
+else:
+    # If it's not in the Trainer, it might be in a newer Config object
+    # or handled by the data collator. We'll set a default in the config if possible.
+    print(">>> Version detected: max_seq_length not in Trainer signature. Attempting Config update.")
+    try:
+        from trl import SFTConfig
+        sft_config = SFTConfig(
+            max_seq_length=512,
+            **training_args.to_dict()
+        )
+        trainer_kwargs["args"] = sft_config
+    except:
+        print(">>> Fallback: Proceeding without explicit max_seq_length.")
+
+trainer = SFTTrainer(**trainer_kwargs)
+
+# 11. Start Training
 print(">>> Starting Fine-Tuning...")
 trainer.train(resume_from_checkpoint=last_checkpoint)
 
-# 11. Final Save
+# Final Save
 model.save_pretrained(OUTPUT_DIR)
-print(f"Training finished. Final model saved to {OUTPUT_DIR}")
