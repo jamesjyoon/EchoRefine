@@ -15,6 +15,9 @@ from transformers.trainer_utils import get_last_checkpoint
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from trl import SFTTrainer
 import inspect
+from dotenv import load_dotenv
+load_dotenv()
+HF_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
 
 # 1. Config
 MODEL_ID = "meta-llama/Llama-3.3-70B-Instruct"
@@ -95,11 +98,11 @@ bnb_config = BitsAndBytesConfig(
 
 print(f"Loading {MODEL_ID}...")
 model = AutoModelForCausalLM.from_pretrained(
-    MODEL_ID, quantization_config=bnb_config, device_map="auto"
+    MODEL_ID, quantization_config=bnb_config, device_map="auto", token=HF_TOKEN
 )
 model = prepare_model_for_kbit_training(model)
 
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, token=HF_TOKEN )
 tokenizer.pad_token = tokenizer.eos_token
 
 peft_config = LoraConfig(
