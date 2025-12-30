@@ -18,7 +18,7 @@ import inspect
 
 # 1. Config
 MODEL_ID = "meta-llama/Llama-3.1-70B-Instruct"
-OUTPUT_DIR = "./llama-70b-nepali-refined"
+OUTPUT_DIR = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-nepali-refined"
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
 DATASET_ID = "opus100"
 NUM_SAMPLES = 5000     
