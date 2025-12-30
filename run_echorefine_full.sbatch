@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH -J EchoRefine_Full_Task
+#SBATCH -J EchoRefine_Final
 #SBATCH --account=coc
 #SBATCH -N 1
 #SBATCH --gres=gpu:a100:2
-#SBATCH --mem=256G
+#SBATCH --mem=192G
 #SBATCH -t 04:00:00
 #SBATCH --cpus-per-task=8
 #SBATCH -q coc-ice
@@ -11,32 +11,28 @@
 #SBATCH -e logs/%j.err
 
 # --- 1. Environment Setup ---
-
-# Force all tools to use Storage
-export HF_HOME="/storage/ice1/6/3/jyoon370/hf_cache"
-export TORCH_HOME="/storage/ice1/6/3/jyoon370/hf_cache/torch"
-export TMPDIR="/storage/ice1/6/3/jyoon370/tmp"
-export PIP_CACHE_DIR="/storage/ice1/6/3/jyoon370/hf_cache/pip"
-
-# Create directories to be safe
-mkdir -p $HF_HOME $TORCH_HOME $TMPDIR $PIP_CACHE_DIR
-
-# Load CUDA so the GPU is visible to torch
 module load cuda/12.1
-
-# Define the absolute path to your environment's python
-# This ensures we use the version that has 'torch' installed
 PYTHON_PATH="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
 
-# Ensure we are in the correct working directory
+# Force ALL caches and temp files to the LARGE storage area
+export HF_HOME="/storage/ice1/6/3/jyoon370/hf_cache"
+export TMPDIR="/storage/ice1/6/3/jyoon370/tmp"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
+export TOKENIZERS_PARALLELISM=false
+
+mkdir -p $HF_HOME $TMPDIR logs
+
 cd /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine
 
-export TOKENIZERS_PARALLELISM=false
-# This helps 'bitsandbytes' find the CUDA library on PACE
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
+# --- 2. Run Pipeline ---
+echo "Starting Stage 1: Fine-Tuning..."
+$PYTHON_PATH train_echorefine.py
 
-# --- 2. Run Python using the absolute path ---
-echo "Running job on $(hostname)"
-echo "Using Python from: $PYTHON_PATH"
+if [ $? -eq 0 ]; then
+    echo "Fine-tuning successful. Starting Stage 2: Evaluation..."
+    $PYTHON_PATH evaluate_final.py
+else
+    echo "Training failed. Check logs/%j.err"
+    exit 1
+fi
 
-$PYTHON_PATH train_echorefine.py && $PYTHON_PATH evaluate_final.py
