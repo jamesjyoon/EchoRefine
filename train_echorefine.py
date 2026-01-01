@@ -1,163 +1,53 @@
-import os
-import torch
-import pandas as pd
-import gc
-from tqdm import tqdm
+import os, torch, gc
 from datasets import load_dataset
-from transformers import (
-    AutoModelForCausalLM, 
-    AutoTokenizer, 
-    AutoModelForSeq2SeqLM, # Fixed typo here
-    BitsAndBytesConfig, 
-    TrainingArguments
-)
-from transformers.trainer_utils import get_last_checkpoint
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig, TrainingArguments
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
-from trl import SFTTrainer
-import inspect
-from dotenv import load_dotenv
-load_dotenv()
-HF_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
+from trl import SFTTrainer, SFTConfig
 
-# 1. Config
 MODEL_ID = "meta-llama/Llama-3.3-70B-Instruct"
-OUTPUT_DIR = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-nepali-refined"
-MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
-DATASET_ID = "opus100"
-NUM_SAMPLES = 5000     
-BATCH_SIZE = 16        
-TRAIN_DATA_PATH = "train_data.csv"
-
-# ---------------------------------------------------------
-# 2. Step 1: Synthetic Data Prep (Conditional)
-# ---------------------------------------------------------
-# Only generate if the file doesn't exist to save time on resumes
-if not os.path.exists(TRAIN_DATA_PATH):
-    print(f"{TRAIN_DATA_PATH} not found. Generating synthetic data with mBART...")
-    m_tokenizer = AutoTokenizer.from_pretrained(MBART_ID)
-    m_model = AutoModelForSeq2SeqLM.from_pretrained(MBART_ID, torch_dtype=torch.float16).to("cuda")
-
-    dataset = load_dataset(DATASET_ID, "en-ne", split="train", streaming=True)
-    
-    def batch_translate(texts, src_lang, tgt_lang, tgt_token_id):
-        m_tokenizer.src_lang = src_lang
-        inputs = m_tokenizer(texts, return_tensors="pt", padding=True, truncation=True, max_length=128).to("cuda")
-        with torch.no_grad():
-            generated_tokens = m_model.generate(**inputs, forced_bos_token_id=tgt_token_id, max_length=128)
-        return m_tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
-
-    data_rows = []
-    iterator = iter(dataset)
-    ne_token_id = m_tokenizer.lang_code_to_id["ne_NP"]
-    en_token_id = m_tokenizer.lang_code_to_id["en_XX"]
-    
-    pbar = tqdm(total=NUM_SAMPLES)
-    while len(data_rows) < NUM_SAMPLES:
-        batch_en, batch_tgt = [], []
-        for _ in range(BATCH_SIZE):
-            try:
-                s = next(iterator)
-                batch_en.append(s['translation']['en'])
-                batch_tgt.append(s['translation']['ne'])
-            except StopIteration: break
-        
-        if not batch_en: break
-        drafts = batch_translate(batch_en, "en_XX", "ne_NP", ne_token_id)
-        back_trans = batch_translate(drafts, "ne_NP", "en_XX", en_token_id)
-
-        for i in range(len(drafts)):
-            if drafts[i].strip() != batch_tgt[i].strip() and len(data_rows) < NUM_SAMPLES:
-                data_rows.append({"source": batch_en[i], "draft": drafts[i], "back_trans": back_trans[i], "target": batch_tgt[i]})
-                pbar.update(1)
-
-    pd.DataFrame(data_rows).to_csv(TRAIN_DATA_PATH, index=False)
-    
-    # CRITICAL: Free up GPU memory for Llama-70B
-    del m_model
-    del m_tokenizer
-    torch.cuda.empty_cache()
-    gc.collect()
-else:
-    print(f"Found existing {TRAIN_DATA_PATH}. Skipping generation.")
-
-# ---------------------------------------------------------
-# 3. Step 2: Fine-Tuning Setup (Llama-3.1-70B)
-# ---------------------------------------------------------
-
-# Check for existing checkpoints to resume
-last_checkpoint = None
-if os.path.exists(OUTPUT_DIR) and len(os.listdir(OUTPUT_DIR)) > 0:
-    last_checkpoint = get_last_checkpoint(OUTPUT_DIR)
-    if last_checkpoint:
-        print(f">>> Resuming training from checkpoint: {last_checkpoint}")
+OUTPUT_DIR = "./llama-70b-nepali-refined-v2"
+TRAIN_PATH = "train_data_10k.csv"
+HF_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
 
 bnb_config = BitsAndBytesConfig(
     load_in_4bit=True, bnb_4bit_quant_type="nf4", 
     bnb_4bit_compute_dtype=torch.float16, bnb_4bit_use_double_quant=True
 )
 
-print(f"Loading {MODEL_ID}...")
-model = AutoModelForCausalLM.from_pretrained(
-    MODEL_ID, quantization_config=bnb_config, device_map="auto", token=HF_TOKEN
-)
+model = AutoModelForCausalLM.from_pretrained(MODEL_ID, quantization_config=bnb_config, device_map="auto", token=HF_TOKEN)
 model = prepare_model_for_kbit_training(model)
-
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, token=HF_TOKEN )
+tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, token=HF_TOKEN)
 tokenizer.pad_token = tokenizer.eos_token
 
+# High-Rank LoRA for complex linguistic mapping
 peft_config = LoraConfig(
-    r=16, lora_alpha=32, target_modules=["q_proj", "v_proj", "k_proj", "o_proj"],
-    lora_dropout=0.05, bias="none", task_type="CAUSAL_LM"
+    r=32, # Increased from 16
+    lora_alpha=64, 
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+    lora_dropout=0.05, 
+    task_type="CAUSAL_LM"
 )
 model = get_peft_model(model, peft_config)
 
-def formatting_func(example):
-    return [
-        f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
-        f"Source: {s}\nDraft: {d}\nBack-trans: {b}\n\nRESULT:<|eot_id|>"
-        f"<|start_header_id|>assistant<|end_header_id|>\n\n{t}<|eot_id|>"
-        for s, d, b, t in zip(example['source'], example['draft'], example['back_trans'], example['target'])
-    ]
+def prep(example):
+    return {"text": f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nSource: {example['source']}\nDraft: {example['draft']}\nBack-trans: {example['back_trans']}\n\nRESULT:<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{example['target']}<|eot_id|>"}
 
-# 9. Pre-process dataset to avoid "str" tensor errors
-raw_dataset = load_dataset("csv", data_files=TRAIN_DATA_PATH, split="train")
+train_ds = load_dataset("csv", data_files=TRAIN_PATH, split="train").map(prep)
 
-def preprocess_function(example):
-    # This matches the prompt format we want the model to learn
-    return {
-        "text": f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
-                f"Source: {example['source']}\nDraft: {example['draft']}\nBack-trans: {example['back_trans']}\n\n"
-                f"RESULT:<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
-                f"{example['target']}<|eot_id|>"
-    }
-
-train_dataset = raw_dataset.map(preprocess_function, remove_columns=raw_dataset.column_names)
-
-# 10. Training Configuration
-training_args = TrainingArguments(
+args = SFTConfig(
     output_dir=OUTPUT_DIR,
+    max_seq_length=1024,
+    dataset_text_field="text",
     per_device_train_batch_size=1,
-    gradient_accumulation_steps=8,
+    gradient_accumulation_steps=16, # Larger effective batch size for stability
     max_steps=1000, 
-    learning_rate=2e-4,
+    learning_rate=1e-4, # Slightly lower LR for higher rank
     fp16=True,
-    logging_steps=10,
-    save_steps=100,            
-    save_total_limit=2,        
+    save_total_limit=2,
     optim="paged_adamw_8bit",
     report_to="none"
 )
 
-trainer = SFTTrainer(
-    model=model,
-    train_dataset=train_dataset, # Now using the cleaned "text" dataset
-    dataset_text_field="text",    # Explicitly tell trainer which column to use
-    peft_config=peft_config,
-    max_seq_length=512,
-    args=training_args,
-)
-
-# 11. Start Training
-print(">>> Starting Fine-Tuning...")
-trainer.train(resume_from_checkpoint=last_checkpoint)
+trainer = SFTTrainer(model=model, train_dataset=train_ds, args=args)
+trainer.train()
 model.save_pretrained(OUTPUT_DIR)
