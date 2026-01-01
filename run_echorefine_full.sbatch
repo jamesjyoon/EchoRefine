@@ -1,48 +1,57 @@
 #!/bin/bash
-#SBATCH -J EchoRefine_Final
-#SBATCH --account=coc
-#SBATCH -N 1
-#SBATCH --gres=gpu:a100:2
-#SBATCH --mem=192G
-#SBATCH -t 08:00:00
-#SBATCH --cpus-per-task=8
-#SBATCH -q coc-ice
+#SBATCH -J EchoRefine_Research_v2       # Job name
+#SBATCH --account=coc                    # Your account
+#SBATCH -N 1                             # One node
+#SBATCH --gres=gpu:a100:2                # 2x A100 GPUs (80GB total)
+#SBATCH --mem=256G                       # Increased RAM to handle 70B loading spikes
+#SBATCH -t 08:00:00                      # 8 hours time limit
+#SBATCH --cpus-per-task=16               # Higher CPU count for faster data processing
+#SBATCH -q coc-ice                       # QOS
 #SBATCH -o /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/logs/%j.out
 #SBATCH -e /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/logs/%j.err
 
-# --- 1. Define Absolute Paths ---
-PROJECT_DIR="/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine"
-PYTHON_BIN="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
-CACHE_DIR="/storage/ice1/6/3/jyoon370/hf_cache"
-
-# --- 2. Environment Setup ---
+# --- 1. Environment Setup ---
+module load anaconda3
 module load cuda/12.1
-export HF_HOME="$CACHE_DIR"
+
+# Path to your specific environment python executable
+PYTHON_BIN="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
+PROJECT_DIR="/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine"
+
+# Safety: Redirect ALL cache to storage to avoid 30GB Home limit
+export HF_HOME="/storage/ice1/6/3/jyoon370/hf_cache"
 export TMPDIR="/storage/ice1/6/3/jyoon370/tmp"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
 export TOKENIZERS_PARALLELISM=false
-export HF_TOKEN=$(grep HUGGING_FACE_HUB_TOKEN .env | cut -d '=' -f2)
-export HF_HUB_TOKEN=$HF_TOKEN
 
-# Ensure directories exist before starting
-mkdir -p "$PROJECT_DIR/logs" "$TMPDIR" "$HF_HOME"
+# Ensure folders exist
+mkdir -p "$PROJECT_DIR/logs" "$HF_HOME" "$TMPDIR"
 
-# Move into the project directory
 cd "$PROJECT_DIR"
 
-# --- 3. Run Pipeline ---
-echo "Job started on $(hostname) at $(date)"
-echo "Working directory: $(pwd)"
+# --- 2. Check Hardware ---
+echo "Starting job on $(hostname) at $(date)"
+nvidia-smi
 
-echo ">>> Starting Stage 1: Fine-Tuning..."
-$PYTHON_BIN train_echorefine.py
+# --- 3. Run Pipeline Stages ---
+
+echo ">>> STAGE 1: Generating 10k Synthetic Refinement Samples..."
+time $PYTHON_BIN generate_train_data.py
 
 if [ $? -eq 0 ]; then
-    echo ">>> Training successful. Starting Stage 2: Evaluation..."
-    $PYTHON_BIN evaluate_final.py
+    echo ">>> STAGE 2: Starting QLoRA Fine-Tuning (Rank 32)..."
+    time $PYTHON_BIN train_echorefine.py
 else
-    echo ">>> Training failed! check the .err file."
+    echo "Data generation failed. Exiting."
     exit 1
 fi
 
-echo "Job finished at $(date)"
+if [ $? -eq 0 ]; then
+    echo ">>> STAGE 3: Running Final Benchmarks (mBART vs ZS vs FT)..."
+    time $PYTHON_BIN evaluate_final.py
+else
+    echo "Fine-tuning failed. Exiting."
+    exit 1
+fi
+
+echo ">>> ALL RESEARCH STAGES COMPLETE at $(date)"
