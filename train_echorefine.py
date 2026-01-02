@@ -30,7 +30,15 @@ peft_config = LoraConfig(
 model = get_peft_model(model, peft_config)
 
 def prep(example):
-    return {"text": f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nSource: {example['source']}\nDraft: {example['draft']}\nBack-trans: {example['back_trans']}\n\nRESULT:<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n{example['target']}<|eot_id|>"}
+    # We add the "literal" instruction to the System/User prompt
+    return {"text": f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
+            f"Source: {example['source']}\n"
+            f"Draft: {example['draft']}\n"
+            f"Back-trans: {example['back_trans']}\n\n"
+            f"Instruction: Fix the Draft based on the Back-trans. "
+            f"Keep the translation literal and consistent with the draft where correct.<|eot_id|>" # <-- INSERT HERE
+            f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+            f"{example['target']}<|eot_id|>"}
 
 train_ds = load_dataset("csv", data_files=TRAIN_PATH, split="train").map(prep)
 
