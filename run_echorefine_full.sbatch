@@ -14,6 +14,8 @@
 module load anaconda3
 module load cuda/12.1
 
+conda activate llm_bti
+
 # Load .env variables if file exists (handling spaces around =)
 if [ -f .env ]; then
     export $(grep -v '^#' .env | sed 's/ *= */=/g' | xargs)
