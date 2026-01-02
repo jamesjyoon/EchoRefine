@@ -14,6 +14,11 @@
 module load anaconda3
 module load cuda/12.1
 
+# Load .env variables if file exists (handling spaces around =)
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | sed 's/ *= */=/g' | xargs)
+fi
+
 # Path to your specific environment python executable
 PYTHON_BIN="/storage/ice1/6/3/jyoon370/conda_envs/llm_bti/bin/python"
 PROJECT_DIR="/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine"
