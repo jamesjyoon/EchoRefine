@@ -10,7 +10,7 @@ BATCH_SIZE = 16
 
 print("Loading mBART for data generation...")
 tokenizer = AutoTokenizer.from_pretrained(MBART_ID)
-model = AutoModelForSeq2SeqLM.from_pretrained(MBART_ID, torch_dtype=torch.float16).to("cuda")
+model = AutoModelForSeq2SeqLM.from_pretrained(MBART_ID, dtype=torch.float16).to("cuda")
 
 dataset = load_dataset(DATASET_ID, "en-ne", split="train", streaming=True)
 ne_id, en_id = tokenizer.lang_code_to_id["ne_NP"], tokenizer.lang_code_to_id["en_XX"]
