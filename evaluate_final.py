@@ -58,10 +58,19 @@ class EchoRefineUltimateEvaluator:
         return self.n_tok.decode(out[0], skip_special_tokens=True).strip()
 
     def llama_refine(self, src, draft, back_en):
-        prompt = f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\nSource: {src}\nDraft: {draft}\nBack-trans: {back_en}\n\nRESULT:<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
-        inputs = self.l_tok(prompt, return_tensors="pt").to(self.l_mod.device)
-        out = self.l_mod.generate(**inputs, max_new_tokens=256, do_sample=False, pad_token_id=self.l_tok.eos_token_id)
-        return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
+    # Ensure this prompt matches the 'prep' function in the training script exactly
+    prompt = (
+        f"<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
+        f"Source: {src}\n"
+        f"Draft: {draft}\n"
+        f"Back-trans: {back_en}\n\n"
+        f"Instruction: Fix the Draft based on the Back-trans. "
+        f"Keep the translation literal and consistent with the draft where correct.<|eot_id|>" # <-- INSERT HERE
+        f"<|start_header_id|>assistant<|end_header_id|>\n\n"
+    )
+    inputs = self.l_tok(prompt, return_tensors="pt").to(self.l_mod.device)
+    out = self.l_mod.generate(**inputs, max_new_tokens=256, do_sample=False)
+    return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
 
     def get_best_sentence(self, source, mbart_cand, llama_cand):
         """Sentence-level selection using QE Judge."""
