@@ -1,4 +1,6 @@
 import os
+import time
+import requests
 import torch
 import json
 import numpy as np
@@ -85,7 +87,21 @@ class EchoRefineUltimateEvaluator:
 
 def run_research_benchmark(num_samples=100):
     ev = EchoRefineUltimateEvaluator()
-    df = load_dataset("openlanguagedata/flores_plus", split='devtest').to_pandas()
+    
+    # Robust Dataset Loading
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            df = load_dataset("openlanguagedata/flores_plus", split='devtest').to_pandas()
+            break
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"Dataset load failed: {e}. Retrying in 5 seconds...")
+                time.sleep(5)
+            else:
+                print("Failed to load dataset after multiple attempts.")
+                raise e 
+
     srcs = df[df['iso_639_3'] == 'eng']['text'].tolist()[:num_samples]
     refs = df[df['iso_639_3'] == 'npi']['text'].tolist()[:num_samples]
 
@@ -125,8 +141,33 @@ def run_research_benchmark(num_samples=100):
         metrics[key] = {"BLEU": round(b, 2), "chrF": round(c, 2), "COMET": round(cm, 2)}
 
     # Save and Plot (same as before)
-    with open("ultimate_results.json", "w") as f: json.dump(metrics, f, indent=4)
+    # Save and Plot
+    with open("outcome.json", "w") as f: json.dump(metrics, f, indent=4)
     print(json.dumps(metrics, indent=4))
+
+    # Create Comparison Plot
+    models = list(metrics.keys())
+    metric_names = ["BLEU", "chrF", "COMET"]
+    
+    x = np.arange(len(metric_names))
+    width = 0.35
+    
+    fig, ax = plt.subplots(figsize=(8, 6))
+    
+    for i, model_name in enumerate(models):
+        scores = [metrics[model_name][m] for m in metric_names]
+        rects = ax.bar(x + (i * width), scores, width, label=model_name)
+        ax.bar_label(rects, padding=3)
+
+    ax.set_ylabel('Score')
+    ax.set_title('EchoRefine v2 Performance Benchmark')
+    ax.set_xticks(x + width / 2)
+    ax.set_xticklabels(metric_names)
+    ax.legend()
+    
+    plt.tight_layout()
+    plt.savefig("outcome.png")
+    print(">>> Plot saved to outcome.png")
 
 if __name__ == "__main__":
     run_research_benchmark(num_samples=100)

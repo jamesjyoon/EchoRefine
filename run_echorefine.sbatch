@@ -56,6 +56,11 @@ fi
 if [ $? -eq 0 ]; then
     echo ">>> STAGE 3: Running Final Benchmarks (mBART vs ZS vs FT)..."
     time $PYTHON_BIN evaluate_final.py
+    
+    if [ $? -ne 0 ]; then
+        echo "Evaluation failed. Exiting."
+        exit 1
+    fi
 else
     echo "Fine-tuning failed. Exiting."
     exit 1

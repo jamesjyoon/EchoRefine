@@ -1,4 +1,4 @@
-import os, torch, pandas as pd
+import os, torch, pandas as pd, gc
 from tqdm import tqdm
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
@@ -42,5 +42,10 @@ while len(data) < NUM_SAMPLES:
         if drafts[i].strip() != batch_tgt[i].strip() and len(data) < NUM_SAMPLES:
             data.append({"source": batch_en[i], "draft": drafts[i], "back_trans": back[i], "target": batch_tgt[i]})
             pbar.update(1)
+
+# Explicitly cleanup streaming dataset iterator to prevent shutdown race condition
+del iterator
+del dataset
+gc.collect()
 
 pd.DataFrame(data).to_csv("train_data_10k.csv", index=False)

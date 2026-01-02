@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.env
+.ipynb_checkpoints/
+logs/
+llama-70b-nepali-refined*/
+hf_cache/
+tmp/
+*.csv
+*.json
+*.png
+!outcome.json
+!outcome.png
