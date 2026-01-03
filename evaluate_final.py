@@ -161,4 +161,8 @@ def run_best_of_n(num_samples=100):
     plt.savefig("best_of_n_chart.png")
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     run_best_of_n(num_samples=100)
+=======
+    run_best_of_n(num_samples=100)
+>>>>>>> 073fa2b (Update evaluate_final.py)
