@@ -43,7 +43,7 @@ nvidia-smi
 # --- 3. Run Evaluation Only ---
 
 echo ">>> STAGE 3: Running Final Benchmarks (mBART vs ZS vs FT)..."
-time $PYTHON_BIN evaluate_final.py
+time $PYTHON_BIN evaluate_mbr.py
 
 if [ $? -ne 0 ]; then
     echo "Evaluation failed. Exiting."
