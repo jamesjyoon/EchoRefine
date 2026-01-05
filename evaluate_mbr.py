@@ -122,13 +122,17 @@ class HybridEvaluator:
         # --- Stage 2: Gatekeeping ---
         data = [{"src": source, "mt": mbart_draft}, {"src": source, "mt": best_llm}]
         with torch.no_grad():
+            # Use the QE judge to compare mBART vs. Winner of MBR
             qe_scores = self.qe_judge.predict(data, batch_size=2, gpus=1, progress_bar=False).scores
         
-        if qe_scores[1] > (qe_scores[0] - 0.05):
+        # STRICT LOGIC: 
+        # Only accept the LLM if it is STRICTLY BETTER than mBART.
+        # This acts as a hard safety net. If LLM is just "different," we keep mBART.
+        if qe_scores[1] > qe_scores[0]: 
             return best_llm, "LLM"
         
         return mbart_draft, "mBART"
-        
+
 def run_hybrid_benchmark(num_samples=100):
     ev = HybridEvaluator()
     
@@ -189,4 +193,4 @@ def run_hybrid_benchmark(num_samples=100):
     plt.savefig("hybrid_full_results.png")
 
 if __name__ == "__main__":
-    run_hybrid_benchmark(num_samples=100)
+    run_hybrid_benchmark(num_samples=1012)
