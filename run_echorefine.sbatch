@@ -4,7 +4,7 @@
 #SBATCH -N 1                             # One node
 #SBATCH --gres=gpu:a100:2                # 2x A100 GPUs (80GB total)
 #SBATCH --mem=256G                       # Increased RAM to handle 70B loading spikes
-#SBATCH -t 08:00:00                      # 8 hours time limit
+#SBATCH -t 12:00:00                      # 8 hours time limit
 #SBATCH --cpus-per-task=16               # Higher CPU count for faster data processing
 #SBATCH -q coc-ice                       # QOS
 #SBATCH -o /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/logs/%j.out
@@ -43,11 +43,11 @@ nvidia-smi
 # --- 3. Run Pipeline Stages ---
 
 echo ">>> STAGE 1: Generating 10k Synthetic Refinement Samples..."
-time $PYTHON_BIN generate_train_data.py
+time $PYTHON_BIN generate_multilingual_data.py
 
 if [ $? -eq 0 ]; then
     echo ">>> STAGE 2: Starting QLoRA Fine-Tuning (Rank 32)..."
-    time $PYTHON_BIN train_echorefine.py
+    time $PYTHON_BIN train_multilingual.py
 else
     echo "Data generation failed. Exiting."
     exit 1
@@ -55,7 +55,7 @@ fi
 
 if [ $? -eq 0 ]; then
     echo ">>> STAGE 3: Running Final Benchmarks (mBART vs ZS vs FT)..."
-    time $PYTHON_BIN evaluate_mbr.py
+    time $PYTHON_BIN evaluate_multilingual_resumable.py
     
     if [ $? -ne 0 ]; then
         echo "Evaluation failed. Exiting."
