@@ -7,16 +7,22 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 # --- Configuration ---
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
-SAMPLES_PER_LANG = 2000  # 5 langs * 2000 = 10k total
+SAMPLES_PER_LANG = 1500  # 8 langs * 1500 = 12k total
 BATCH_SIZE = 32
 
 # Language Config: (OPUS_Code, mBART_Code, Language_Name)
 LANG_CONFIGS = [
+    # --- Low Resource ---
     ("ne", "ne_NP", "Nepali"),
-    ("bn", "bn_IN", "Bengali"),
     ("si", "si_LK", "Sinhala"),
     ("my", "my_MM", "Burmese"),
-    ("ko", "ko_KR", "Korean")
+    ("am", "am_ET", "Amharic"),
+    
+    # --- Mid/High Resource ---
+    ("bn", "bn_IN", "Bengali"),
+    ("hi", "hi_IN", "Hindi"),
+    ("ko", "ko_KR", "Korean"),
+    ("fr", "fr_XX", "French") 
 ]
 
 # --- Setup ---
