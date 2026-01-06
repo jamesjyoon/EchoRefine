@@ -4,7 +4,7 @@
 #SBATCH -N 1                             # One node
 #SBATCH --gres=gpu:a100:2                # 2x A100 GPUs (80GB total)
 #SBATCH --mem=256G                       # Increased RAM to handle 70B loading spikes
-#SBATCH -t 12:00:00                      # 12 hours time limit 
+#SBATCH -t 8:00:00                      # 12 hours time limit 
 #SBATCH --cpus-per-task=16               # Higher CPU count for faster data processing
 #SBATCH -q coc-ice                       # QOS
 #SBATCH -o /storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/logs/eval_%j.out
