@@ -54,13 +54,23 @@ else
 fi
 
 if [ $? -eq 0 ]; then
-    echo ">>> STAGE 3: Running Final Benchmarks (mBART vs ZS vs FT)..."
-    time $PYTHON_BIN evaluate_multilingual_resumable.py
+    echo ">>> STAGE 3: Running Multilingual Benchmarks..."
     
-    if [ $? -ne 0 ]; then
-        echo "Evaluation failed. Exiting."
-        exit 1
-    fi
+    LANGUAGES="npi ben sin mya kor tam hin fra"
+    
+    for lang in $LANGUAGES; do
+        echo "------------------------------------------------"
+        echo ">>> Evaluating Language: $lang"
+        echo "------------------------------------------------"
+        
+        # Run the python script with the required argument
+        time $PYTHON_BIN evaluate_multilingual_resumable.py --lang $lang
+        
+        # Check if it failed
+        if [ $? -ne 0 ]; then
+            echo "Warning: Evaluation for $lang failed or timed out."
+        fi
+    done
 else
     echo "Fine-tuning failed. Exiting."
     exit 1
