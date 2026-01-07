@@ -16,7 +16,7 @@ LANG_CONFIGS = [
     ("ne", "ne_NP", "Nepali"),
     ("si", "si_LK", "Sinhala"),
     ("my", "my_MM", "Burmese"),
-    ("ta", "ta_IN", "Tamil"),   # <--- REPLACED Amharic (supported by mBART)
+    ("ta", "ta_IN", "Tamil"),   
     
     # --- Mid/High Resource ---
     ("bn", "bn_IN", "Bengali"),
