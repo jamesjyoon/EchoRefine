@@ -43,7 +43,7 @@ LANG_MAP = {
     "sin": {"mbart": "si_LK", "name": "Sinhala"},
     "mya": {"mbart": "my_MM", "name": "Burmese"},
     "kor": {"mbart": "ko_KR", "name": "Korean"},
-    "amh": {"mbart": "am_ET", "name": "Amharic"},
+    "tam": {"mbart": "ta_IN", "name": "Tamil"},  
     "hin": {"mbart": "hi_IN", "name": "Hindi"},
     "fra": {"mbart": "fr_XX", "name": "French"}
 }
