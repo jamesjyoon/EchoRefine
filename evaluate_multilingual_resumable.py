@@ -256,7 +256,7 @@ def finalize_results(results, srcs, refs, lang_iso):
         
         b = sacrebleu.corpus_bleu(preds, refs_nested).score
         c = chrf.compute(predictions=preds, references=refs_nested)['score']
-        cm = comet_ref.compute(predictions=preds, references=refs[:limit], sources=srcs[:limit], batch_size=8)['mean_score'] * 100
+        cm = comet_ref.compute(predictions=preds, references=refs_flat, sources=srcs_flat)['mean_score'] * 100
         metrics[k] = {"BLEU": round(b, 2), "chrF": round(c, 2), "COMET": round(cm, 2)}
 
     print(json.dumps(metrics, indent=4))
