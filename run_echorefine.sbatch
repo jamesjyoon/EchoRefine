@@ -54,6 +54,14 @@ else
 fi
 
 if [ $? -eq 0 ]; then
+    echo ">>> STAGE 2: Starting QLoRA Fine-Tuning (Rank 32)..."
+    time $PYTHON_BIN train_direct.py
+else
+    echo "Data generation failed. Exiting."
+    exit 1
+fi
+
+if [ $? -eq 0 ]; then
     echo ">>> STAGE 3: Running Multilingual Benchmarks..."
     
     LANGUAGES="npi ben sin mya kor tam hin fra"
