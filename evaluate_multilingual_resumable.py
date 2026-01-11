@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import argparse
+import re
 from tqdm import tqdm
 from peft import PeftModel
 from datasets import load_dataset
@@ -26,11 +27,15 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # --- Configuration ---
 LLAMA_ID = "meta-llama/Llama-3.3-70B-Instruct"
-# UPDATE THIS PATH to your new Multilingual Adapter folder
-ADAPTER_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-multilingual-refined"
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
 QE_MODEL_NAME = "Unbabel/wmt22-cometkiwi-da"
 HF_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
+
+# *** NEW ADAPTER PATHS ***
+# 1. The Refinement Adapter (Source + Draft + Back -> Target)
+ADAPTER_REFINE_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-multilingual-refined"
+# 2. The Direct Translation Adapter (Source -> Target)
+ADAPTER_DIRECT_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-direct-ft"
 
 # Parameters
 NUM_CANDIDATES = 5  
@@ -43,7 +48,7 @@ LANG_MAP = {
     "sin": {"mbart": "si_LK", "name": "Sinhala"},
     "mya": {"mbart": "my_MM", "name": "Burmese"},
     "kor": {"mbart": "ko_KR", "name": "Korean"},
-    "tam": {"mbart": "ta_IN", "name": "Tamil"},  
+    "tam": {"mbart": "ta_IN", "name": "Tamil"},
     "hin": {"mbart": "hi_IN", "name": "Hindi"},
     "fra": {"mbart": "fr_XX", "name": "French"}
 }
@@ -60,14 +65,28 @@ class MultilingualEvaluator:
         qe_path = download_model(QE_MODEL_NAME)
         self.qe_judge = load_from_checkpoint(qe_path).to("cuda")
         
-        # Load Llama-70B
+        # Load Llama-70B Base
+        print(">>> Loading Llama-70B Base...")
         bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
-        base = AutoModelForCausalLM.from_pretrained(
+        self.base_l = AutoModelForCausalLM.from_pretrained(
             LLAMA_ID, quantization_config=bnb, device_map="auto", token=HF_TOKEN
         )
-        self.base_l = PeftModel.from_pretrained(base, ADAPTER_PATH)
         self.l_tok = AutoTokenizer.from_pretrained(LLAMA_ID, token=HF_TOKEN)
         self.l_tok.pad_token = self.l_tok.eos_token
+        
+        # --- Load Adapters ---
+        # 1. Load Refinement Adapter (Name: 'refine')
+        print(f">>> Loading Refinement Adapter: {ADAPTER_REFINE_PATH}")
+        self.base_l = PeftModel.from_pretrained(self.base_l, ADAPTER_REFINE_PATH, adapter_name="refine")
+        
+        # 2. Load Direct Adapter (Name: 'direct') - Conditional load
+        self.has_direct = False
+        if os.path.exists(ADAPTER_DIRECT_PATH):
+            print(f">>> Loading Direct Adapter: {ADAPTER_DIRECT_PATH}")
+            self.base_l.load_adapter(ADAPTER_DIRECT_PATH, adapter_name="direct")
+            self.has_direct = True
+        else:
+            print(">>> WARNING: Direct Adapter path not found. Skipping 'Direct FT' evaluation.")
         
         # Load mBART
         self.n_tok = AutoTokenizer.from_pretrained(MBART_ID)
@@ -80,31 +99,41 @@ class MultilingualEvaluator:
         return self.n_tok.decode(out[0], skip_special_tokens=True).strip()
 
     def generate_zero_shot(self, source, lang_name):
+        """Adapter Disabled."""
         with self.base_l.disable_adapter():
             messages = [{"role": "user", "content": f"Translate English to {lang_name}: {source}"}]
             prompt = self.l_tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
             inputs = self.l_tok(prompt, return_tensors="pt").to(self.base_l.device)
-            out = self.base_l.generate(
-                **inputs, max_new_tokens=256, do_sample=False, pad_token_id=self.l_tok.eos_token_id
-            )
+            out = self.base_l.generate(**inputs, max_new_tokens=256, do_sample=False, pad_token_id=self.l_tok.eos_token_id)
             return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
 
-    def generate_candidates(self, src, draft, back_en, lang_name):
-        """
-        Generates candidates using the Multilingual Adapter.
-        CRITICAL: The prompt structure matches 'train_multilingual.py' exactly.
-        """
-        sys_msg = f"You are a professional {lang_name} editor. Fix the draft based on back-translation."
+    def generate_direct_ft(self, source, lang_name):
+        """Uses 'direct' adapter."""
+        if not self.has_direct: return "N/A"
         
+        self.base_l.set_adapter("direct") # Switch weights
+        
+        # Matches train_direct.py prompt
+        messages = [
+            {"role": "system", "content": f"You are a professional {lang_name} translator. Translate the English text accurately."},
+            {"role": "user", "content": f"English: {source}\n{lang_name}:"}
+        ]
+        prompt = self.l_tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        inputs = self.l_tok(prompt, return_tensors="pt").to(self.base_l.device)
+        out = self.base_l.generate(**inputs, max_new_tokens=256, do_sample=False, pad_token_id=self.l_tok.eos_token_id)
+        return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
+
+    def generate_candidates_refine(self, src, draft, back_en, lang_name):
+        """Uses 'refine' adapter."""
+        self.base_l.set_adapter("refine") # Switch weights
+        
+        # Matches train_multilingual.py prompt
+        sys_msg = f"You are a professional {lang_name} editor. Fix the draft based on back-translation."
         prompt = (
-            f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
-            f"{sys_msg}<|eot_id|>"
+            f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n{sys_msg}<|eot_id|>"
             f"<|start_header_id|>user<|end_header_id|>\n\n"
-            f"Source: {src}\n"
-            f"Draft: {draft}\n"
-            f"Back-trans: {back_en}\n\n"
-            f"Instruction: Fix the Draft based on the Back-trans. "
-            f"Keep the translation literal and consistent with the draft where correct.<|eot_id|>"
+            f"Source: {src}\nDraft: {draft}\nBack-trans: {back_en}\n\n"
+            f"Instruction: Fix the Draft based on the Back-trans. Keep the translation literal and consistent with the draft where correct.<|eot_id|>"
             f"<|start_header_id|>assistant<|end_header_id|>\n\n"
         )
         inputs = self.l_tok(prompt, return_tensors="pt").to(self.base_l.device)
@@ -121,6 +150,7 @@ class MultilingualEvaluator:
         return list(set(candidates))
 
     def hybrid_selection(self, source, mbart_draft, llm_candidates):
+        """Stage 1: MBR -> Stage 2: Gatekeeping"""
         if not llm_candidates: return mbart_draft, "mBART"
 
         # 1. MBR Selection
@@ -131,7 +161,7 @@ class MultilingualEvaluator:
         else:
             best_llm = llm_candidates[0]
 
-        # 2. Strict Gatekeeping
+        # 2. Strict Gatekeeping (vs mBART)
         data = [{"src": source, "mt": mbart_draft}, {"src": source, "mt": best_llm}]
         with torch.no_grad():
             qe_scores = self.qe_judge.predict(data, batch_size=2, gpus=1, progress_bar=False).scores
@@ -141,16 +171,13 @@ class MultilingualEvaluator:
         return mbart_draft, "mBART"
 
 def run_benchmark(lang_iso):
-    # Setup Language Variables
-    if lang_iso not in LANG_MAP:
-        raise ValueError(f"Language {lang_iso} not supported in config.")
+    if lang_iso not in LANG_MAP: raise ValueError(f"Language {lang_iso} not supported.")
     
     LANG_NAME = LANG_MAP[lang_iso]["name"]
     MBART_CODE = LANG_MAP[lang_iso]["mbart"]
     PROGRESS_FILE = f"progress_{lang_iso}.jsonl"
     
-    print(f"\n>>> Starting Benchmark for: {LANG_NAME} ({lang_iso})")
-    print(f">>> mBART Code: {MBART_CODE} | Progress File: {PROGRESS_FILE}")
+    print(f"\n>>> Starting Benchmark: {LANG_NAME} ({lang_iso})")
 
     # Load Data
     try:
@@ -182,19 +209,25 @@ def run_benchmark(lang_iso):
         for i in tqdm(range(start_idx, len(srcs))):
             src = srcs[i]
             
-            # A. Baselines
+            # 1. mBART
             draft = ev.mbart_translate(src, "en_XX", MBART_CODE)
-            zero_shot = ev.generate_zero_shot(src, LANG_NAME)
             
-            # B. EchoRefine
+            # 2. Zero-Shot
+            zs = ev.generate_zero_shot(src, LANG_NAME)
+            
+            # 3. Direct FT (Optional Check)
+            direct_ft = ev.generate_direct_ft(src, LANG_NAME)
+            
+            # 4. EchoRefine
             back = ev.mbart_translate(draft, MBART_CODE, "en_XX")
-            candidates = ev.generate_candidates(src, draft, back, LANG_NAME)
+            candidates = ev.generate_candidates_refine(src, draft, back, LANG_NAME)
             final, winner = ev.hybrid_selection(src, draft, candidates)
             
             row = {
                 "idx": i,
                 "mBART": draft,
-                "Llama_ZS": zero_shot,
+                "Llama_ZS": zs,
+                "Llama_Direct": direct_ft, # New Column
                 "EchoRefine": final,
                 "Winner": winner
             }
@@ -205,38 +238,38 @@ def run_benchmark(lang_iso):
     finalize_results(results_so_far, srcs, refs, lang_iso)
 
 def finalize_results(results, srcs, refs, lang_iso):
-    print(">>> Calculating Final Metrics...")
+    print(">>> Calculating Metrics...")
     chrf = evaluate.load("chrf")
     comet_ref = evaluate.load("comet", "Unbabel/wmt22-comet-da")
     
-    mbart_preds = [r["mBART"] for r in results]
-    zs_preds = [r["Llama_ZS"] for r in results]
-    echo_preds = [r["EchoRefine"] for r in results]
-    
-    limit = len(results)
-    refs_nested = [[r] for r in refs[:limit]]
-    refs_flat = refs[:limit]
-    srcs_flat = srcs[:limit]
+    # Extract columns
+    keys = ["mBART", "Llama_ZS", "EchoRefine"]
+    if results[0]["Llama_Direct"] != "N/A":
+        keys.insert(2, "Llama_Direct")
 
     metrics = {}
-    for name, preds in [("mBART", mbart_preds), ("Llama_ZS", zs_preds), ("EchoRefine", echo_preds)]:
+    limit = len(results)
+    
+    for k in keys:
+        preds = [r[k] for r in results]
+        refs_nested = [[r] for r in refs[:limit]]
+        
         b = sacrebleu.corpus_bleu(preds, refs_nested).score
         c = chrf.compute(predictions=preds, references=refs_nested)['score']
-        cm = comet_ref.compute(predictions=preds, references=refs_flat, sources=srcs_flat, batch_size=8)['mean_score'] * 100
-        metrics[name] = {"BLEU": round(b, 2), "chrF": round(c, 2), "COMET": round(cm, 2)}
+        cm = comet_ref.compute(predictions=preds, references=refs[:limit], sources=srcs[:limit], batch_size=8)['mean_score'] * 100
+        metrics[k] = {"BLEU": round(b, 2), "chrF": round(c, 2), "COMET": round(cm, 2)}
 
     print(json.dumps(metrics, indent=4))
-    with open(f"results_{lang_iso}.json", "w") as f:
-        json.dump(metrics, f, indent=4)
+    with open(f"results_{lang_iso}.json", "w") as f: json.dump(metrics, f, indent=4)
         
     df_plot = pd.DataFrame(metrics).T
-    df_plot.plot(kind='bar', figsize=(10, 6), color=['#34495e', '#e67e22', '#27ae60'])
-    plt.title(f"Final Results: English -> {lang_iso} (N={limit})")
+    df_plot.plot(kind='bar', figsize=(10, 6))
+    plt.title(f"Comparison: {lang_iso} (N={limit})")
     plt.savefig(f"chart_{lang_iso}.png")
     print(f"Saved chart_{lang_iso}.png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lang", type=str, required=True, help="ISO code (npi, ben, sin, etc.)")
+    parser.add_argument("--lang", type=str, required=True)
     args = parser.parse_args()
     run_benchmark(args.lang)
