@@ -157,7 +157,7 @@ class MultilingualEvaluator:
         # Return BOTH the Raw LLM choice and the Gatekept Final choice
         return best_llm, final_output, ("LLM" if qe_scores[1] > qe_scores[0] else "mBART")
 
-def run_benchmark(lang_iso):
+def run_benchmark(lang_iso, limit=None):
     if lang_iso not in LANG_MAP: raise ValueError(f"Language {lang_iso} not supported.")
     
     LANG_NAME = LANG_MAP[lang_iso]["name"]
@@ -174,7 +174,11 @@ def run_benchmark(lang_iso):
 
     srcs = df[df['iso_639_3'] == 'eng']['text'].tolist()
     refs = df[df['iso_639_3'] == lang_iso]['text'].tolist()
-    
+
+    if limit: # <--- Apply logic
+        srcs = srcs[:limit]
+        refs = refs[:limit]
+        
     # Resume Logic
     results_so_far = []
     if os.path.exists(PROGRESS_FILE):
@@ -258,5 +262,6 @@ def finalize_results(results, srcs, refs, lang_iso):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--lang", type=str, required=True)
+    parser.add_argument("--limit", type=int, default=None, help="Limit number of samples for testing")
     args = parser.parse_args()
-    run_benchmark(args.lang)
+    run_benchmark(args.lang, limit=args.limit)
