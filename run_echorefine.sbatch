@@ -74,7 +74,7 @@ for lang in $LANGUAGES; do
     echo ">>> Evaluating Language: $lang"
     echo "------------------------------------------------"
     
-    time $PYTHON_BIN evaluate_multilingual_resumable.py --lang $lang
+    time $PYTHON_BIN evaluate_multilingual_resumable.py --lang $lang --limit 10
     
     if [ $? -ne 0 ]; then
         echo "Warning: Evaluation for $lang failed or timed out."
