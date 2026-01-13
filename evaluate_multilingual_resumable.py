@@ -6,7 +6,6 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import argparse
-import re
 from tqdm import tqdm
 from peft import PeftModel
 from datasets import load_dataset
@@ -27,21 +26,18 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 # --- Configuration ---
 LLAMA_ID = "meta-llama/Llama-3.3-70B-Instruct"
+# Update this if your path changed
+ADAPTER_REFINE_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-multilingual-refined"
+ADAPTER_DIRECT_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-direct-ft"
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
 QE_MODEL_NAME = "Unbabel/wmt22-cometkiwi-da"
 HF_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
-
-# *** NEW ADAPTER PATHS ***
-# 1. The Refinement Adapter (Source + Draft + Back -> Target)
-ADAPTER_REFINE_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-multilingual-refined"
-# 2. The Direct Translation Adapter (Source -> Target)
-ADAPTER_DIRECT_PATH = "/storage/ice1/6/3/jyoon370/EchoRefine_Project/EchoRefine/llama-70b-direct-ft"
 
 # Parameters
 NUM_CANDIDATES = 5  
 TEMPERATURE = 0.6
 
-# Language Configs
+# Language Configs (Added Tamil, Removed Amharic as discussed)
 LANG_MAP = {
     "npi": {"mbart": "ne_NP", "name": "Nepali"},
     "ben": {"mbart": "bn_IN", "name": "Bengali"},
@@ -74,19 +70,17 @@ class MultilingualEvaluator:
         self.l_tok = AutoTokenizer.from_pretrained(LLAMA_ID, token=HF_TOKEN)
         self.l_tok.pad_token = self.l_tok.eos_token
         
-        # --- Load Adapters ---
-        # 1. Load Refinement Adapter (Name: 'refine')
+        # Load Adapters
         print(f">>> Loading Refinement Adapter: {ADAPTER_REFINE_PATH}")
         self.base_l = PeftModel.from_pretrained(self.base_l, ADAPTER_REFINE_PATH, adapter_name="refine")
         
-        # 2. Load Direct Adapter (Name: 'direct') - Conditional load
-        self.has_direct = False
         if os.path.exists(ADAPTER_DIRECT_PATH):
             print(f">>> Loading Direct Adapter: {ADAPTER_DIRECT_PATH}")
             self.base_l.load_adapter(ADAPTER_DIRECT_PATH, adapter_name="direct")
             self.has_direct = True
         else:
-            print(">>> WARNING: Direct Adapter path not found. Skipping 'Direct FT' evaluation.")
+            print(">>> WARNING: Direct Adapter not found. Skipping.")
+            self.has_direct = False
         
         # Load mBART
         self.n_tok = AutoTokenizer.from_pretrained(MBART_ID)
@@ -99,7 +93,6 @@ class MultilingualEvaluator:
         return self.n_tok.decode(out[0], skip_special_tokens=True).strip()
 
     def generate_zero_shot(self, source, lang_name):
-        """Adapter Disabled."""
         with self.base_l.disable_adapter():
             messages = [{"role": "user", "content": f"Translate English to {lang_name}: {source}"}]
             prompt = self.l_tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
@@ -108,12 +101,8 @@ class MultilingualEvaluator:
             return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
 
     def generate_direct_ft(self, source, lang_name):
-        """Uses 'direct' adapter."""
         if not self.has_direct: return "N/A"
-        
-        self.base_l.set_adapter("direct") # Switch weights
-        
-        # Matches train_direct.py prompt
+        self.base_l.set_adapter("direct")
         messages = [
             {"role": "system", "content": f"You are a professional {lang_name} translator. Translate the English text accurately."},
             {"role": "user", "content": f"English: {source}\n{lang_name}:"}
@@ -124,10 +113,7 @@ class MultilingualEvaluator:
         return self.l_tok.decode(out[0][inputs.input_ids.shape[-1]:], skip_special_tokens=True).strip()
 
     def generate_candidates_refine(self, src, draft, back_en, lang_name):
-        """Uses 'refine' adapter."""
-        self.base_l.set_adapter("refine") # Switch weights
-        
-        # Matches train_multilingual.py prompt
+        self.base_l.set_adapter("refine")
         sys_msg = f"You are a professional {lang_name} editor. Fix the draft based on back-translation."
         prompt = (
             f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n{sys_msg}<|eot_id|>"
@@ -150,25 +136,26 @@ class MultilingualEvaluator:
         return list(set(candidates))
 
     def hybrid_selection(self, source, mbart_draft, llm_candidates):
-        """Stage 1: MBR -> Stage 2: Gatekeeping"""
-        if not llm_candidates: return mbart_draft, "mBART"
-
-        # 1. MBR Selection
-        if len(llm_candidates) > 1:
+        # 1. MBR Selection (This gives us the "Raw" LLM winner)
+        if not llm_candidates: 
+            best_llm = mbart_draft
+        elif len(llm_candidates) > 1:
             embeddings = self.mbr_scorer.encode(llm_candidates, convert_to_tensor=True)
             cos_scores = util.pytorch_cos_sim(embeddings, embeddings).sum(dim=1)
             best_llm = llm_candidates[torch.argmax(cos_scores).item()]
         else:
             best_llm = llm_candidates[0]
 
-        # 2. Strict Gatekeeping (vs mBART)
+        # 2. Gatekeeping (Compares LLM Winner vs mBART)
         data = [{"src": source, "mt": mbart_draft}, {"src": source, "mt": best_llm}]
         with torch.no_grad():
             qe_scores = self.qe_judge.predict(data, batch_size=2, gpus=1, progress_bar=False).scores
         
-        if qe_scores[1] > qe_scores[0]:
-            return best_llm, "LLM"
-        return mbart_draft, "mBART"
+        # Strict Logic: Keep mBART unless LLM is strictly better
+        final_output = best_llm if qe_scores[1] > qe_scores[0] else mbart_draft
+        
+        # Return BOTH the Raw LLM choice and the Gatekept Final choice
+        return best_llm, final_output, ("LLM" if qe_scores[1] > qe_scores[0] else "mBART")
 
 def run_benchmark(lang_iso):
     if lang_iso not in LANG_MAP: raise ValueError(f"Language {lang_iso} not supported.")
@@ -209,26 +196,25 @@ def run_benchmark(lang_iso):
         for i in tqdm(range(start_idx, len(srcs))):
             src = srcs[i]
             
-            # 1. mBART
+            # A. Baselines
             draft = ev.mbart_translate(src, "en_XX", MBART_CODE)
-            
-            # 2. Zero-Shot
-            zs = ev.generate_zero_shot(src, LANG_NAME)
-            
-            # 3. Direct FT (Optional Check)
+            zero_shot = ev.generate_zero_shot(src, LANG_NAME)
             direct_ft = ev.generate_direct_ft(src, LANG_NAME)
             
-            # 4. EchoRefine
+            # B. EchoRefine
             back = ev.mbart_translate(draft, MBART_CODE, "en_XX")
             candidates = ev.generate_candidates_refine(src, draft, back, LANG_NAME)
-            final, winner = ev.hybrid_selection(src, draft, candidates)
+            
+            # Get RAW LLM winner AND Hybrid Final Result
+            raw_llm, final_hybrid, winner = ev.hybrid_selection(src, draft, candidates)
             
             row = {
                 "idx": i,
                 "mBART": draft,
-                "Llama_ZS": zs,
-                "Llama_Direct": direct_ft, # New Column
-                "EchoRefine": final,
+                "Llama_ZS": zero_shot,
+                "Llama_Direct": direct_ft,
+                "EchoRefine_Raw": raw_llm,      # <-- New Column: Ablation Study
+                "EchoRefine_Hybrid": final_hybrid, # <-- Our Main Method
                 "Winner": winner
             }
             f.write(json.dumps(row) + "\n")
@@ -242,29 +228,30 @@ def finalize_results(results, srcs, refs, lang_iso):
     chrf = evaluate.load("chrf")
     comet_ref = evaluate.load("comet", "Unbabel/wmt22-comet-da")
     
-    # Extract columns
-    keys = ["mBART", "Llama_ZS", "EchoRefine"]
-    if results[0]["Llama_Direct"] != "N/A":
-        keys.insert(2, "Llama_Direct")
+    limit = len(results)
+    refs_nested = [[r] for r in refs[:limit]]
+    refs_flat = refs[:limit]
+    srcs_flat = srcs[:limit]
+
+    # Dynamically determine valid keys
+    keys = ["mBART", "Llama_ZS", "EchoRefine_Raw", "EchoRefine_Hybrid"]
+    if results[0]["Llama_Direct"] != "N/A": keys.insert(2, "Llama_Direct")
 
     metrics = {}
-    limit = len(results)
-    
     for k in keys:
         preds = [r[k] for r in results]
-        refs_nested = [[r] for r in refs[:limit]]
-        
         b = sacrebleu.corpus_bleu(preds, refs_nested).score
         c = chrf.compute(predictions=preds, references=refs_nested)['score']
-        cm = comet_ref.compute(predictions=preds, references=refs_flat, sources=srcs_flat)['mean_score'] * 100
+        cm = comet_ref.compute(predictions=preds, references=refs_flat, sources=srcs_flat, batch_size=8)['mean_score'] * 100
         metrics[k] = {"BLEU": round(b, 2), "chrF": round(c, 2), "COMET": round(cm, 2)}
 
     print(json.dumps(metrics, indent=4))
     with open(f"results_{lang_iso}.json", "w") as f: json.dump(metrics, f, indent=4)
         
     df_plot = pd.DataFrame(metrics).T
-    df_plot.plot(kind='bar', figsize=(10, 6))
-    plt.title(f"Comparison: {lang_iso} (N={limit})")
+    df_plot.plot(kind='bar', figsize=(12, 6))
+    plt.title(f"Ablation Study: {lang_iso} (N={limit})")
+    plt.ylabel("Score")
     plt.savefig(f"chart_{lang_iso}.png")
     print(f"Saved chart_{lang_iso}.png")
 
