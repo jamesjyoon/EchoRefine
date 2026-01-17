@@ -46,13 +46,13 @@ if [ $? -ne 0 ]; then
 fi
 
 # --- STEP 2a: TRAIN REFINEMENT ADAPTER ---
-echo ">>> STAGE 2a: Starting QLoRA Fine-Tuning (Refinement)..."
-time $PYTHON_BIN train_multilingual.py
+# echo ">>> STAGE 2a: Starting QLoRA Fine-Tuning (Refinement)..."
+# time $PYTHON_BIN train_multilingual.py
 
-if [ $? -ne 0 ]; then
-    echo "CRITICAL: Refinement training failed. Exiting."
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "CRITICAL: Refinement training failed. Exiting."
+#     exit 1
+# fi
 
 # --- STEP 2b: TRAIN DIRECT ADAPTER ---
 echo ">>> STAGE 2b: Starting QLoRA Fine-Tuning (Direct Translation)..."
