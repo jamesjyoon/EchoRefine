@@ -87,7 +87,16 @@ trainer = SFTTrainer(
     args=sft_config
 )
 
+# --- Resume Logic ---
+from transformers.trainer_utils import get_last_checkpoint
+
+last_checkpoint = None
+if os.path.isdir(OUTPUT_DIR):
+    last_checkpoint = get_last_checkpoint(OUTPUT_DIR)
+    if last_checkpoint:
+        print(f">>> Resuming from checkpoint: {last_checkpoint}")
+
 print(">>> Starting Multilingual Fine-Tuning...")
-trainer.train()
+trainer.train(resume_from_checkpoint=last_checkpoint)
 model.save_pretrained(OUTPUT_DIR)
 print(f"Model saved to {OUTPUT_DIR}")
