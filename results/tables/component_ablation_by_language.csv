@@ -1,0 +1,41 @@
+component_configuration,language,BLEU,chrF,COMET
+mBART Anchor,npi,8.16,48.15,79.0
+mBART Anchor,ben,6.01,31.72,55.03
+mBART Anchor,sin,9.51,28.01,77.21
+mBART Anchor,mya,1.97,49.38,86.54
+mBART Anchor,kor,20.69,29.93,85.73
+mBART Anchor,tam,5.2,47.73,84.48
+mBART Anchor,hin,15.33,47.41,76.37
+mBART Anchor,fra,51.99,66.06,85.62
++ LLM Refinement (no BT),npi,7.54,50.13,80.02
++ LLM Refinement (no BT),ben,16.39,40.26,80.88
++ LLM Refinement (no BT),sin,9.63,26.47,70.48
++ LLM Refinement (no BT),mya,10.68,24.57,64.6
++ LLM Refinement (no BT),kor,23.46,30.67,87.61
++ LLM Refinement (no BT),tam,14.58,41.63,78.04
++ LLM Refinement (no BT),hin,16.12,53.47,76.99
++ LLM Refinement (no BT),fra,49.78,67.9,86.99
++ Back-translation Signal,npi,7.54,50.07,80.1
++ Back-translation Signal,ben,16.39,39.92,80.72
++ Back-translation Signal,sin,10.33,25.86,69.22
++ Back-translation Signal,mya,10.68,24.32,64.05
++ Back-translation Signal,kor,21.41,30.11,87.32
++ Back-translation Signal,tam,14.22,40.97,77.82
++ Back-translation Signal,hin,16.12,53.33,77.4
++ Back-translation Signal,fra,49.78,68.5,87.44
++ MBR (k=5),npi,7.54,49.77,80.19
++ MBR (k=5),ben,13.17,38.62,80.24
++ MBR (k=5),sin,6.92,25.16,67.74
++ MBR (k=5),mya,12.7,23.01,62.18
++ MBR (k=5),kor,12.55,29.19,87.8
++ MBR (k=5),tam,11.48,39.72,77.15
++ MBR (k=5),hin,16.12,52.26,77.04
++ MBR (k=5),fra,63.04,67.38,87.29
++ QE Gate (Hybrid),npi,8.16,50.07,81.28
++ QE Gate (Hybrid),ben,20.29,38.74,77.34
++ QE Gate (Hybrid),sin,9.51,30.13,78.75
++ QE Gate (Hybrid),mya,1.97,49.37,86.51
++ QE Gate (Hybrid),kor,11.21,31.3,88.18
++ QE Gate (Hybrid),tam,5.2,48.88,85.66
++ QE Gate (Hybrid),hin,16.12,50.88,78.97
++ QE Gate (Hybrid),fra,51.99,68.06,87.89

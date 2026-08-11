@@ -1,0 +1,450 @@
+{
+  "npi": {
+    "accepted_refinement": {
+      "idx": 543,
+      "category": "accepted_refinement",
+      "source": "The center of Tibetan meditation is the Deity Yoga. Through the visualization of various deities the energy channels are cleaned, the chakras are activated and the enlightenment consciousness is created.",
+      "reference": "तिब्बती ध्यानको केन्द्र देवता योग हो। विभिन्न देवताहरूको दृश्यताको माध्यमबाट ऊर्जा च्यानलहरू सफा गरिन्छन्, चक्रहरू सक्रिय हुन्छन् र आत्मज्ञान चेतना सिर्जना हुन्छ।",
+      "mBART": "Tibetan meditation is the Deity Yoga. Tibetan meditation is the Deity Yoga, Tibetan meditation is the Deity Yoga, Tibetan meditation is the Deity Yoga, Tibetan meditation is the Deity Yoga, Tibetan meditation is the Deity Yoga, Tibetan meditation is the Deity Yoga",
+      "Llama_ZS": "तिब्बती ध्यान को केन्द्र देवता योग हो । विभिन्न देवताहरुको दृश्यीकरण गरेर ऊर्जा च्यानलहरु साफ पारिएका छन्, चक्र सक्रिय पारिएका छन् र ज्ञान चेतना बनाइएको छ ।",
+      "Llama_Direct": "तिब्बती ध्यानको केन्द्र देवता योग हो । विभिन्न देवताहरूको दृश्यात्मक माध्यमले ऊर्जा च्यानल साफ पारिएका छन्, चक्र सक्रिय पारिएका छन् र ज्ञानात्मक चेतना सिर्जना गरिएको छ ।",
+      "EchoRefine_Raw": "तिब्बती ध्यान को केन्द्र देवता योग हो । विभिन्न देवताहरूको दृश्यात्मकरण गरेर ऊर्जा च्यानल साफ पारिन्छ, चकरहरू सक्रिय पारिन्छन् र ज्ञान चेतना सिर्जन हुन्छ ।",
+      "EchoRefine_Hybrid": "तिब्बती ध्यान को केन्द्र देवता योग हो । विभिन्न देवताहरूको दृश्यात्मकरण गरेर ऊर्जा च्यानल साफ पारिन्छ, चकरहरू सक्रिय पारिन्छन् र ज्ञान चेतना सिर्जन हुन्छ ।",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 0.10588733587462938,
+        "raw_chrF": 69.21909858974627,
+        "hybrid_chrF": 69.21909858974627
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 15,
+      "category": "overcorrection_prevented",
+      "source": "USA Gymnastics supports an independent investigation that may shine light on how abuse of the proportion described so courageously by the survivors of Larry Nassar could have gone undetected for so long and embraces any necessary and appropriate changes.",
+      "reference": "USA जिमनास्टिक्सले स्वतन्त्र अनुसन्धानलाई समर्थन गर्दछ, जुन लेरी नासारका बचेका मानिसहरूले यति साहसपूर्वक ढंगले वर्णन गरिएको मात्राको दुरुपयोगलाई कसरी यति लामो समयसम्म पत्ता लगाउन नसकेको भन्ने कुरामा प्रकाश पार्न सक्दछ र कुनै आवश्यक र उपयुक्त परिवर्तनलाई अँगाल्दछ।",
+      "mBART": "अमेरिका जिम्पसिक्सले लारी नासरको बाँचेकाहरूद्वारा इर्ष्यापूर्वक वर्णन गरिएको अनुपातको दुरुपयोगले कति लामो समयसम्म पत्ता नलगाएको हुन सक्छ भन्नेमा प्रकाश झल्काउन सक्ने एउटा स्वतन्त्र अनुसन्धानलाई समर्थन गर्दछ र आवश्यक र उचित परिवर्तनहरू समाविष्ट गर्दछ ।",
+      "Llama_ZS": "युएसए जिमनास्टिक्स ल्यारी नासारका सरभ्यागीहरुले साहसपूर्वक वर्णन गरेको विपरीत व्यवहार किन त्यस्ता लामो समयसम्म पत्ता लाग्न नपाउने कारण पत्ता लागोस् भनी स्वतन्त्र अनुसन्धानलाई समर्थन गर्दछ र आवश्यक र उपयुक्त परिवर्तनलाई अंगाल्दछ ।",
+      "Llama_Direct": "यूएसए जिमनास्टिक्सले ल्यारी नासरले द्रुत रूपमा साहसपूर्वक जीवनको विरुद्ध दुर्व्यवहार गर्न सक्ने कारणलाई प्रकाश पार्न सक्ने स्वतन्त्र अनुसन्धानलाई समर्थन गर्दछ र आवश्यक र उचित परिवर्तनहरू स्वागत गर्दछ ।",
+      "EchoRefine_Raw": "USA Gymnastics supports an independent investigation that may shine light on how abuse of the proportion described so courageously by the survivors of Larry Nassar could have gone undetected for so long and embraces any necessary and appropriate changes.",
+      "EchoRefine_Hybrid": "अमेरिका जिम्पसिक्सले लारी नासरको बाँचेकाहरूद्वारा इर्ष्यापूर्वक वर्णन गरिएको अनुपातको दुरुपयोगले कति लामो समयसम्म पत्ता नलगाएको हुन सक्छ भन्नेमा प्रकाश झल्काउन सक्ने एउटा स्वतन्त्र अनुसन्धानलाई समर्थन गर्दछ र आवश्यक र उचित परिवर्तनहरू समाविष्ट गर्दछ ।",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 51.487358244893535,
+        "raw_chrF": 0.4461679446752212,
+        "hybrid_chrF": 51.487358244893535
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 964,
+      "category": "anchor_bias_candidate",
+      "source": "The area is also home to an extremely wide variety of animal and bird species.",
+      "reference": "यो क्षेत्र पशु र चरा प्रजातिहरूको अत्यधिक व्यापक विविधताको घर पनि हो।",
+      "mBART": "यस क्षेत्रमा धेरै प्रकारका जनावर र पक्षीहरू पनि बस्छन्।",
+      "Llama_ZS": "क्षेत्र ठूलो संख्यामा जनावर र पंक्षी प्रजातिको घर पनि हो।",
+      "Llama_Direct": "यस क्षेत्रले अत्यन्तै व्यापक प्राणी र पंक्षी प्रजातिको घर पनि बनेको छ ।",
+      "EchoRefine_Raw": "यस क्षेत्रले अत्यन्त व्यापक विविधताका जनावर र पन्छी प्रजातिहरूको घर हो।",
+      "EchoRefine_Hybrid": "यस क्षेत्रमा धेरै प्रकारका जनावर र पक्षीहरू पनि बस्छन्।",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 19.7756822658276,
+        "raw_chrF": 54.45497105431517,
+        "hybrid_chrF": 19.7756822658276
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "ben": {
+    "accepted_refinement": {
+      "idx": 279,
+      "category": "accepted_refinement",
+      "source": "The accused are named as Baba Kanjar, Bhutha Kanjar, Rampro Kanjar, Gaza Kanjar and Vishnu Kanjar.",
+      "reference": "অভিযুক্তদের নাম হল বাবা কাঞ্জার, ভুথা কাঞ্জার, রামপ্রো কাঞ্জার, গাজা কাঞ্জার এবং বিষ্ণু কাঞ্জার।",
+      "mBART": "অভিজ ্ ঞাকে ডাকা হয় Baba Kanjar, Bhutha Kanjar, Rampro Kanjar, Gaza Kanjar এবং Vishnu Kanjar ।",
+      "Llama_ZS": "অভিযুক্তদের নাম দেওয়া হয়েছে বাবা কাঞ্জার, ভূতা কাঞ্জার, রামপ্রো কাঞ্জার, গাজা কাঞ্জার এবং বিষ্ণু কাঞ্জার।",
+      "Llama_Direct": "অভিযুক্তরা হলেন বাবা কাঞ্জার, ভুথা কাঞ্জার, রামপ্রো কাঞ্জার, গাজা কাঞ্জার এবং বিশ্নু কাঞ্জার।",
+      "EchoRefine_Raw": "অভিযুক্তদের নাম বাবা কাঞ্জার, ভুটা কাঞ্জার, রামপ্রো কাঞ্জার, গাজা কাঞ্জার ও বিশ্বনাথ কাঞ্জার।",
+      "EchoRefine_Hybrid": "অভিযুক্তদের নাম বাবা কাঞ্জার, ভুটা কাঞ্জার, রামপ্রো কাঞ্জার, গাজা কাঞ্জার ও বিশ্বনাথ কাঞ্জার।",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 6.318130716532064,
+        "raw_chrF": 77.22060313184923,
+        "hybrid_chrF": 77.22060313184923
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 13,
+      "category": "overcorrection_prevented",
+      "source": "USA Gymnastics supports the United States Olympic Committee's letter and accepts the absolute need of the Olympic family to promote a safe environment for all of our athletes.",
+      "reference": "ইউএসএ জিমন্যাস্টিকস মার্কিন যুক্তরাষ্ট্রের অলিম্পিক কমিটির চিঠিকে সমর্থন করে এবং আমাদের সকল অ্যাথলিটদের ক্ষেত্রে নিরাপদ পরিবেশকে আরও বাড়িয়ে তুলতে অলিম্পিক পরিবারের প্রকৃত প্রয়োজনীয়তার কথা স্বীকার করে।",
+      "mBART": "যুক ্ তরাষ ্ ট ্ রের জিমিস ্ ট ্ যাল কম ্ পিটিমের কাছ থেকে সমর ্ থন পাচ ্ ছে এবং অর ্ থনৈতিক প ্ রয়োজন স ্ কুল বাল ্ পীদের জন ্ য একটি স ্ বাচ ্ ছন ্ ন পরিবেশ প ্ রতিষ ্ ঠা করার এটা স ্ বীকার করে ।",
+      "Llama_ZS": "ইউএসএ জিমন্যাস্টিকস মার্কিন অলিম্পিক কমিটির চিঠিকে সমর্থন করে এবং আমাদের সকল ক্রীড়াবিদদের জন্য নিরাপদ পরিবেশ প্রচারের অলিম্পিক পরিবারের পরম প্রয়োজনীয়তা গ্রহণ করে।",
+      "Llama_Direct": "USA Gymnastics supports the United States Olympic Committee's letter and accepts the absolute need of the Olympic family to promote a safe environment for all of our athletes.",
+      "EchoRefine_Raw": "USA Gymnastics supports the United States Olympic Committee's letter and accepts the absolute need of the Olympic family to promote a safe environment for all of our athletes.",
+      "EchoRefine_Hybrid": "যুক ্ তরাষ ্ ট ্ রের জিমিস ্ ট ্ যাল কম ্ পিটিমের কাছ থেকে সমর ্ থন পাচ ্ ছে এবং অর ্ থনৈতিক প ্ রয়োজন স ্ কুল বাল ্ পীদের জন ্ য একটি স ্ বাচ ্ ছন ্ ন পরিবেশ প ্ রতিষ ্ ঠা করার এটা স ্ বীকার করে ।",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 34.1491881038975,
+        "raw_chrF": 0.0,
+        "hybrid_chrF": 34.1491881038975
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 732,
+      "category": "anchor_bias_candidate",
+      "source": "The Sundarbans are the largest littoral mangrove belt in the world, stretching 80 km (50 mi) into the Bangladeshi and Indian hinterland from the coast.",
+      "reference": "সুন্দরবন বিশ্বের সবথেকে বড় উপকূলবর্তী ম্যানগ্রোভ বন্ধনী, যার পশ্চাজভূমি বাংলাদেশ এবং ভারতের উপকূলে 80 ‌কিমি (50 মাইল) পর্যন্ত প্রসারিত।",
+      "mBART": "দন ্ দর ্ বন হচ ্ ছে পৃথিবীর বৃহত ্ তম উপকূলীয় মঙ ্ গর বেল ্ ট, এটা প ্ রদক ্ ষিণ থেকে ৮০ কিলোমিটার (৫০ মাইল) লম ্ বা வங்காளதேச এবং ভারতীয় সাগরতীরে অবস ্ থিত ।",
+      "Llama_ZS": "সুন্দরবন বিশ্বের বৃহত্তম উপকূলীয় ম্যানগ্রোভ বেল্ট, যা উপকূল থেকে বাংলাদেশ এবং ভারতীয় অভ্যন্তরে ৮০ কিমি (৫০ মাইল) পর্যন্ত বিস্তৃত।",
+      "Llama_Direct": "সুন্দরবন বিশ্বের সর্ববৃহৎ উপকূলীয় ম্যানগ্রোভ বেল্ট, যা উপকূল থেকে বাংলাদেশ ও ভারতের অভ্যন্তরীণ ভূমির ৮০ কিলোমিটার পর্যন্ত বিস্তৃত।",
+      "EchoRefine_Raw": "সুন্দরবন বিশ্বের বৃহত্তম উপকূলবর্তী ম্যানগ্রোভ বনাঞ্চল, যা ৮০ কিলোমিটার (৫০ মাইল) দীর্ঘ বাংলাদেশ ও ভারতের ভূমির মধ্যে প্�",
+      "EchoRefine_Hybrid": "দন ্ দর ্ বন হচ ্ ছে পৃথিবীর বৃহত ্ তম উপকূলীয় মঙ ্ গর বেল ্ ট, এটা প ্ রদক ্ ষিণ থেকে ৮০ কিলোমিটার (৫০ মাইল) লম ্ বা வங்காளதேச এবং ভারতীয় সাগরতীরে অবস ্ থিত ।",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 22.22270797235966,
+        "raw_chrF": 45.60920500374006,
+        "hybrid_chrF": 22.22270797235966
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "sin": {
+    "accepted_refinement": {
+      "idx": 712,
+      "category": "accepted_refinement",
+      "source": "Goma is a tourist city of the Democratic Republic of Congo in the extreme east near Rwanda.",
+      "reference": "ගෝමා යනු රුවන්ඩාව ආසන්නයේ නැගෙනහිර දෙසින් පිහිටි කොංගෝ ප්‍රජාතන්ත්‍රවාදී ජනරජයේ සංචාරක නගරයකි.",
+      "mBART": "goma.com goma.com is a tourist city of the Democratic Republic of Congo in the extreme east near Rwanda.",
+      "Llama_ZS": "ගෝමා යනු රුවන්ඩා ආසන්න පෙරදිග ප්‍රදේශයේ පිහිටි ඩිමොක්‍රතික් ජනරජය විසින් පාලනය කරන නගරයකි.",
+      "Llama_Direct": "කොමා නගරය පිහිටියේ ඩෙමොක්‍රටික් රිපබ්ලික් ඔෆ් කොන්ගෝවේ නැගෙනහිර ප්‍රදේශයේ රුවන්ඩාවට ආසන්නවය.",
+      "EchoRefine_Raw": "කොමා සංචාරක නගරයක් රවාන්ඩාවේ ඉතා දුරදිගින් පිහිටි කොන්ගෝ ප්රජාතන්ත්‍රවාදී ජනරජයේ �",
+      "EchoRefine_Hybrid": "කොමා සංචාරක නගරයක් රවාන්ඩාවේ ඉතා දුරදිගින් පිහිටි කොන්ගෝ ප්රජාතන්ත්‍රවාදී ජනරජයේ �",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 0.1988862370723946,
+        "raw_chrF": 52.485838528140725,
+        "hybrid_chrF": 52.485838528140725
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 161,
+      "category": "overcorrection_prevented",
+      "source": "Their thermal behavior is not as steady as large caves on Earth that often maintain a fairly constant temperature, but it is consistent with these being deep holes in the ground,\" said Glen Cushing of the United States Geological Survey (USGS) Astrogeology Team and of Northern Arizona University located in Flagstaff, Arizona.",
+      "reference": "ඒවායේ තාප හැසිරීම පෘථිවියේ විශාල ගුහා තරම් ස්ථායී නොවන අතර එය බොහෝ විට තරමක් නියත උෂ්ණත්වයක් පවත්වා ගෙන යන නමුත් එය භූමියේ ගැඹුරු සිදුරු වීම සමග සමපාත වේ ”යැයි  ඇරිසෝනාහි, ෆ්ලැග්ස්ටෆ් හි පිහිටි උතුරු ඇරිසෝනා විශ්ව විද්‍යාලයේ ඇමරිකා එක්සත් ජනපද භූවිද්‍යාත්මක සමීක්ෂණ (USGS) අභ්‍යවකාශ භූ විද්‍යා කණ්ඩායමේ ග්ලෙන් කුෂින් පැවසීය.",
+      "mBART": "ඔවුන්ගෙ උෂ්ණත්වය පෘථිවියෙ ඇති විශාල ගුහාවන් තරම් ස්ථිර නෑ බොහෝ විට සමෘහත උෂ්ණත්වයක් රැකගන්න, නමුත් එය මේ පොළවේ ගැඹුරු හිල් සමග සමීහතයි,\" ඇරිසෝනා, ෆ් රැග්ස්තාෆ් වල ඇති උතුරු ඇරිසෝනා විශ්ව විද් යාගාරය හා ඇරිසෝනා එක්සත් ජනපද භෞතික විද් යා පරීක්ෂණ (USGS) වායුගෝල විද් යා කණ්ඩායමේ ග්ලේන් කුෂින්ග් කිව්වා.",
+      "Llama_ZS": "ඔන්නාගේ තාප චර්යා පසුත් ලෙස පෘතවි ගේ විශාල ගුහා සමාන ස්ථිර නොවේ. නමුත් ඒ බිම ගේ ගහන පුරවලින් සමන්විත බව සලකා ඇති බව ඇමරිකානු ජාතික භූ විද්යා ස",
+      "Llama_Direct": "පෘථිවියේ පිහිටි විශාල ගුහාවල පවතින තාප චර්යාවක් මෙන් නොවුන් මෙම ගුහාවල තාප චර්යාව ස්ථිර නොවේ. ඒවා පොළොවේ ගැඹුරු පොත්ගුලි වලට අනුරූප වේ.",
+      "EchoRefine_Raw": "ඔවුන්ගෙ උෂ්ණත්වය පෘථිවියෙ ඇති විශාල ගුහාවන් වගේ නියම නැතිවන, නමුත් ඔවුන්ගෙ උෂ්ණත්",
+      "EchoRefine_Hybrid": "ඔවුන්ගෙ උෂ්ණත්වය පෘථිවියෙ ඇති විශාල ගුහාවන් තරම් ස්ථිර නෑ බොහෝ විට සමෘහත උෂ්ණත්වයක් රැකගන්න, නමුත් එය මේ පොළවේ ගැඹුරු හිල් සමග සමීහතයි,\" ඇරිසෝනා, ෆ් රැග්ස්තාෆ් වල ඇති උතුරු ඇරිසෝනා විශ්ව විද් යාගාරය හා ඇරිසෝනා එක්සත් ජනපද භෞතික විද් යා පරීක්ෂණ (USGS) වායුගෝල විද් යා කණ්ඩායමේ ග්ලේන් කුෂින්ග් කිව්වා.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 45.677901220420424,
+        "raw_chrF": 11.720223449346165,
+        "hybrid_chrF": 45.677901220420424
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 941,
+      "category": "anchor_bias_candidate",
+      "source": "The major religion in Moldova is Orthodox Christian.",
+      "reference": "මෝල්දාවේ ප්‍රධාන ආගම වන්නේ සාධර්මික ක්‍රිස්තියානි ආගමයි.",
+      "mBART": "Moldavia වල ප් රධාන ආගම තමයි Ortodoks Christian.",
+      "Llama_ZS": "මොල්ඩෝවාහි ප්‍රමුඛ ආගම රුසියානු ඕර්තඩෝක්ස් ක්‍රිස්තියානි වේ.",
+      "Llama_Direct": "මොල්ඩෝවාවේ ප්‍රධාන ආගම නිකාය ක්‍රිස්තියානි වේ.",
+      "EchoRefine_Raw": "මොල්ඩොවාවේ ප්‍රධාන ආගම තමයි ඔර්තඩෝක්ස් ක්‍රිස්තියානි.",
+      "EchoRefine_Hybrid": "Moldavia වල ප් රධාන ආගම තමයි Ortodoks Christian.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 14.252835236478449,
+        "raw_chrF": 51.150328228299635,
+        "hybrid_chrF": 14.252835236478449
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "mya": {
+    "accepted_refinement": {
+      "idx": 802,
+      "category": "accepted_refinement",
+      "source": "Anyone who's going to drive at high latitudes or over mountain passes should consider the possibility of snow, ice, or freezing temperatures.",
+      "reference": "လတ္တီကျူးအမြင့်များ၌ သို့မဟုတ် တောင်ကြားလမ်းများ၌ မောင်းနှင်ခြင်းကို ပြုလုပ်မည့်သူတိုင်းက နှင်း၊ ရေခဲ သို့မဟုတ် အေးခဲအပူချိန်တို့ ဖြစ်ပေါ်လာနိုင်ခြေကို ထည့်သွင်းစဉ်းစားသင့်သည်။",
+      "mBART": " anyone who's going to drive at high latitudes or over mountain passes should consider the possibility of snow, ice, or freezing temperatures.",
+      "Llama_ZS": "မည်းသေရည်နှင့် မို့သေရည် အမ်ိဳ့လ္လည့္ သုံးရန္နိယ္ အခါမို့သုံးရန္နိယ္ အမ်ိဳ့လ္လည့္ သုံးရန္နိယ္ အခါ မို့သုံးရန္နိယ္ အမ်ိဳ့လ္လည့္ သုံးရန",
+      "Llama_Direct": "အပူပိုင်းဒေသများတွင် မောင်းနှင်ရန် စီစဉ်နေသူများသည် ဆီးနှင့်ငွေ့ခြင်း သို့မဟုတ် အအေးမြတ်မှု ဖြစ်နိုင်ခြေကို စဉ်းစားသင့်ပါသည်။",
+      "EchoRefine_Raw": "မည်းသော အမြင့့်အတိုင်းးများ သို့မဟုတ် တောင်ကြားတောင်တန်းများ ပေါ်သို့ အမြင့့်�",
+      "EchoRefine_Hybrid": "မည်းသော အမြင့့်အတိုင်းးများ သို့မဟုတ် တောင်ကြားတောင်တန်းများ ပေါ်သို့ အမြင့့်�",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 0.0,
+        "raw_chrF": 25.036457378353642,
+        "hybrid_chrF": 25.036457378353642
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 853,
+      "category": "overcorrection_prevented",
+      "source": "Backpacking by ski: This activity is also called backcountry ski, ski touring or ski hiking.",
+      "reference": "ကျောပိုးအိတ်နှင့် နှင်းလျှောစီး ခရီးသွားခြင်း- ဤလုပ်ဆောင်ချက်ကို နှင်းလျှောစီးခြင်း၊ နှင်းလျှောစီး၍ ခရီးသွားခြင်း သို့မဟုတ် နှင်းလျှောစီး၍ တောင်တက်ခြင်း ဟုလည်း ခေါ်ဆိုပါသည်။",
+      "mBART": "နှင်းလျှောစီး ဖြင့် အပြန်အလှန် ခရီးသွား ခြင်း : ဤ လှုပ်ရှား မှု ကို တောင် နှင်းလျှောစီး ခြင်း ၊ နှင်းလျှောစီး ခရီးသွား ခြင်း သို့မဟုတ် နှင်းလျှောစီး တောင်တက် ခြင်း ဟု လည်း ခေါ် သည် ။",
+      "Llama_ZS": "ဆောင်းဘီဘီတုံ ချိန်းချိန်းခုတ်ချိန်း: ဒီလုပ်ငန်းကို backcountry ski, ski touring လို႔ေဆာင္း ဆိုင္းလဲ ဟုလဲ ခေါ်ခေါ်လဲ။",
+      "Llama_Direct": "စကီဖြင့် ခြောက်လှန်သွားခြင်း - ဤသည်ကို နောက်ပိုင်းတောင်ပိုင်း စကီ၊ စကီခရီးသွားခြင်း သို့မဟုတ် စကီနှင့် ခြောက်လှန်ခြင်း ဟုလည်း ခေါ်ကြသည",
+      "EchoRefine_Raw": "နှင်းလျှောစီးနှင်းပါကစ်ချ်ကိုယ်တုံ့ပြီးလိုက်ပါတီးကို ခေါ်ပါသည်။",
+      "EchoRefine_Hybrid": "နှင်းလျှောစီး ဖြင့် အပြန်အလှန် ခရီးသွား ခြင်း : ဤ လှုပ်ရှား မှု ကို တောင် နှင်းလျှောစီး ခြင်း ၊ နှင်းလျှောစီး ခရီးသွား ခြင်း သို့မဟုတ် နှင်းလျှောစီး တောင်တက် ခြင်း ဟု လည်း ခေါ် သည် ။",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 72.77088522010979,
+        "raw_chrF": 18.266467580977885,
+        "hybrid_chrF": 72.77088522010979
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 891,
+      "category": "anchor_bias_candidate",
+      "source": "As soon as you get out of the current, swimming back is no more difficult than normally.",
+      "reference": "ရေစီးကြောင်းမှ ထွက်လာသည်နှင့် ရေကူးခြင်းသည် ပုံမှန်အားဖြင့် မခက်ခဲတော့ပါ။",
+      "mBART": "သင် ရေစီးကြောင်း ထဲမှ ထွက် သွား သည် နှင့်တစ်ပြိုင်နက် ၊ ပြန်လည် ရေကူး ခြင်း သည် ပုံမှန် ထက် ပို ၍ ခက်ခဲ ခြင်း မ ရှိ ပါ ။",
+      "Llama_ZS": "လှိမ့်မှ ထွက်ခါနီး မူလုံရဲ့ ပတ်လဲ့ခ်မ့္ တဲ့နီး လဲ့ခ်မ့္ တဲ့နီး မူလုံရဲ့ ပတ်လဲ့ခ်မ့္ တဲ့နီး လဲ့ခ်မ့္ တဲ့နီး မူလုံရဲ့ ပတ်လဲ့ခ်မ့္ တဲ့နီး �",
+      "Llama_Direct": "သင်လွတ်မြောက်ပြီဆိုလျှင် ပြန်လှမ်းရန် ပုံမှန်ထက် ခက်ခဲမှု မရှိတော့ပေ။",
+      "EchoRefine_Raw": "သင်ရေစီးကြောင်းမှထွက်လာသည်နှင့်တစ်ပြိုင်နက် ပြန်လည်ရေကူးခြင်းသည် ပုံမှန်ထက်ပ",
+      "EchoRefine_Hybrid": "သင် ရေစီးကြောင်း ထဲမှ ထွက် သွား သည် နှင့်တစ်ပြိုင်နက် ၊ ပြန်လည် ရေကူး ခြင်း သည် ပုံမှန် ထက် ပို ၍ ခက်ခဲ ခြင်း မ ရှိ ပါ ။",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 58.49767475065012,
+        "raw_chrF": 66.7689420004166,
+        "hybrid_chrF": 58.49767475065012
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "kor": {
+    "accepted_refinement": {
+      "idx": 277,
+      "category": "accepted_refinement",
+      "source": "The Madhya Pradesh Police recovered the stolen laptop and mobile phone.",
+      "reference": "마디아 프라데시 경찰은 도난당한 노트북과 휴대폰을 회수했다.",
+      "mBART": "Madhya Pradesh 경찰은 도난된 노트북과 핸드폰을 찾았습니다.",
+      "Llama_ZS": "마디야 프라데시 경찰은 도난당한 랩탑과 휴대폰을 회수했다.",
+      "Llama_Direct": "마디야 프라데시 경찰은 도난당한 노트북과 휴대폰을 회수했다.",
+      "EchoRefine_Raw": "마디야 프라데시 주 경찰은 도난 당한 노트북과 휴대폰을 회수했다.",
+      "EchoRefine_Hybrid": "마디야 프라데시 주 경찰은 도난 당한 노트북과 휴대폰을 회수했다.",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 19.051669251552166,
+        "raw_chrF": 78.94223537431616,
+        "hybrid_chrF": 78.94223537431616
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 123,
+      "category": "overcorrection_prevented",
+      "source": "The truck driver, who is aged 64, was not injured in the crash.",
+      "reference": "64세인 트럭 운전수는 충돌 사고에서 부상을 입지 않았습니다.",
+      "mBART": "64세의 트럭 운전자는 사고에서 부상을 입지 않았습니다.",
+      "Llama_ZS": "트럭 운전사인 64세 남성은 사고로 부상은 당하지 않았다.",
+      "Llama_Direct": "트럭 운전기사는 64세로 사고 중 부상은 없었지만, 2명의 승객은 사망했다.",
+      "EchoRefine_Raw": "사고로 인해 부상자는 없었고, 64세의 운전기사는 사고로 부상이 없었고",
+      "EchoRefine_Hybrid": "64세의 트럭 운전자는 사고에서 부상을 입지 않았습니다.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 62.63022296730681,
+        "raw_chrF": 10.350188696370763,
+        "hybrid_chrF": 62.63022296730681
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 941,
+      "category": "anchor_bias_candidate",
+      "source": "The major religion in Moldova is Orthodox Christian.",
+      "reference": "몰도바의 주요 종교는 동방정교입니다.",
+      "mBART": "Moldova의 주요 종교는 Ortodoks 기독교입니다.",
+      "Llama_ZS": "몰도바의 주요 종교는 동방 정교회이다.",
+      "Llama_Direct": "몰도바의 주요 종교는 동방 정교회다.",
+      "EchoRefine_Raw": "몰도바의 주요 종교는 동방정교회이다.",
+      "EchoRefine_Hybrid": "Moldova의 주요 종교는 Ortodoks 기독교입니다.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 34.19289729847653,
+        "raw_chrF": 75.02410579616462,
+        "hybrid_chrF": 34.19289729847653
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "tam": {
+    "accepted_refinement": {
+      "idx": 392,
+      "category": "accepted_refinement",
+      "source": "Sometimes special pyramid shaped towers, called ziggurats, were built to be a part of the temples.",
+      "reference": "சில சமயங்களில் சிறப்பு பிரமிட் வடிவ ஜிக்குராட்டுகள் என்று வழங்கப்பட்ட கோபுரங்களை, கோயில்களின் பாகமாகக் கட்டினார்கள்.",
+      "mBART": "sometimes special pyramid shaped towers, called ziggurats, were built to be a part of the temples.",
+      "Llama_ZS": "சில சமயங்களில் சிறப்பு பிரமிட வடிவ கோபுரங்கள், சிக்குறாட்டுகள் என்று அழைக்கப்படுகின்றன, கோயில்களின் ஒரு பகுதியாக கட்டப்பட்டன.",
+      "Llama_Direct": "சில சமயங்களில் சிறப்பு பிரமிட் வடிவ கோபுரங்கள், சிக்குராட்டுகள் என்று அழைக்கப்படுகின்றன, கோயில்களின் ஒரு பகுதியாக கட்டப்பட்டன.",
+      "EchoRefine_Raw": "சில சமயங்களில், சிறப்பு பிரமிட் வடிவமான கோபுரங்கள், சிக்கரட்டுகள் என்று அழைக்கப்பட்டு, கோயில்களின் ஒரு பகுதியாக க�",
+      "EchoRefine_Hybrid": "சில சமயங்களில், சிறப்பு பிரமிட் வடிவமான கோபுரங்கள், சிக்கரட்டுகள் என்று அழைக்கப்பட்டு, கோயில்களின் ஒரு பகுதியாக க�",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 0.3313452617627569,
+        "raw_chrF": 59.149979732914446,
+        "hybrid_chrF": 59.149979732914446
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 929,
+      "category": "overcorrection_prevented",
+      "source": "Courier companies are well paid for delivering things quickly. Frequently, time is very important with business documents, merchandise or spare parts for an urgent repair.",
+      "reference": "பொருட்களை வேகமாக வழங்குவதற்கு கூரியர் நிறுவங்கள் நல்ல வருமானங்களை பெறுகின்றன. அடிகடி வணிக ஆவணங்கள், பொருட்கள் அல்லது அவசர பழுதுபார்க்க உதிரி பாகங்களுடன் நேரம் மிகவும் முக்கியமானது.",
+      "mBART": "சரக்குகளை விரைவாக விநியோகிப்பதில் கப்பல் நிறுவனங்கள் சிறந்த முறையில் ஊதியம் பெறுகின்றன. அடிக்கடி, வணிக ஆவணங்கள், பொருட்கள் அல்லது அவசரமான பழுதுபார்வைக்கான உபகரணங்கள் ஆகியவற்றில் நேரம் மிகவும் முக்கியமானது.",
+      "Llama_ZS": "விரைவாக பொருட்களை அளிக்க கூரியர் நிறுவனங்கள் நன்கு ஊதியம் பெறுகின்றன. பெரும்பாலும், வணிக ஆவணங்கள், பொருட்கள் அல்லது அவசர சரிசெய்தலுக்கான பதிலீடப் பாகங்களுடன் நேரம் மிகவும் முக்கியமானது",
+      "Llama_Direct": "விரைவாக வருமானம் செலுத்துவதற்காக கொரியர் நிறுவனங்கள் நன்கு கட்டளைக்கப்பட்டுள்ளன. பெரும்பாலும், வணிக ஆவணங்கள், பொருட்கள் அல்லது மிகவும் அவசர சரிசெய்தலுக்கான பகுதிகளுடன் நேரம் மிகவு�",
+      "EchoRefine_Raw": "தந்தையின் திருமணம்",
+      "EchoRefine_Hybrid": "சரக்குகளை விரைவாக விநியோகிப்பதில் கப்பல் நிறுவனங்கள் சிறந்த முறையில் ஊதியம் பெறுகின்றன. அடிக்கடி, வணிக ஆவணங்கள், பொருட்கள் அல்லது அவசரமான பழுதுபார்வைக்கான உபகரணங்கள் ஆகியவற்றில் நேரம் மிகவும் முக்கியமானது.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 57.393894072181894,
+        "raw_chrF": 3.416592870585341,
+        "hybrid_chrF": 57.393894072181894
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 570,
+      "category": "anchor_bias_candidate",
+      "source": "The first public reading of the document was by John Nixon in the yard of Independence Hall on July 8.",
+      "reference": "இந்த ஆவணத்தின் முதல் பொது வாசிப்பு ஜூலை 8 அன்று சுதந்திர மண்டபத்தின் முற்றத்தில் ஜான் நிக்சன் எழுதியது.",
+      "mBART": "ஜூலை 8 அன்று ஜான் நிக்சன் சுயாதீன மண்டபத்தின் மைதானத்தில் இந்த ஆவணத்தை பகிரங்கமாக வாசித்தார்.",
+      "Llama_ZS": "ஆவணத்தின் முதல் பொது வாசிப்பு சூலை 8 அன்று சுதந்திர மண்டபத்தின் முற்றத்தில் ஜான் நிக்சனால் செய்யப்பட்டது.",
+      "Llama_Direct": "இந்த ஆவணத்தின் முதல் பொது வாசிப்பு ஜூலை 8 அன்று சுதந்திர மண்டபத்தின் முற்றத்தில் ஜான் நிக்சனால் செய்யப்பட்டது.",
+      "EchoRefine_Raw": "இந்த ஆவணத்தின் முதல் பொது வாசிப்பு ஜூலை 8 அன்று சுதந்திர மண்டபத்தின் வளாகத்தில் ஜான் நிக்சன் ஆல் செய்யப்பட்டது.",
+      "EchoRefine_Hybrid": "ஜூலை 8 அன்று ஜான் நிக்சன் சுயாதீன மண்டபத்தின் மைதானத்தில் இந்த ஆவணத்தை பகிரங்கமாக வாசித்தார்.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 47.996889882528485,
+        "raw_chrF": 81.28758439931993,
+        "hybrid_chrF": 47.996889882528485
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "hin": {
+    "accepted_refinement": {
+      "idx": 195,
+      "category": "accepted_refinement",
+      "source": "The photographer was transported to Ronald Reagan UCLA Medical Center, where he subsequently died.",
+      "reference": "फ़ोटोग्राफ़र को रोनाल्ड रीगन यूसीएलए मेडिकल सेंटर ले जाया गया, जहाँ बाद में उसकी मौत हो गई.",
+      "mBART": "फोटोग्राफर को Ronald Reagan UCLA Medical Center ले जाया गया, जहां वह बाद में मर गया।",
+      "Llama_ZS": "फोटोग्राफर को रोनाल्ड रीगन यूसीएलए मेडिकल सेंटर ले जाया गया, जहां बाद में उनकी मृत्यु हो गई।",
+      "Llama_Direct": "फोटोग्राफर को रोनाल्ड रीगन UCLA मेडिकल सेंटर ले जाया गया, जहां बाद में उसकी मौत हो गई.",
+      "EchoRefine_Raw": "फोटोग्राफर को रोनाल्ड रीगन यूसीएलए मेडिकल सेंटर ले जाया गया, जहां बाद में उसकी मृत्यु हो गई।",
+      "EchoRefine_Hybrid": "फोटोग्राफर को रोनाल्ड रीगन यूसीएलए मेडिकल सेंटर ले जाया गया, जहां बाद में उसकी मृत्यु हो गई।",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 30.480419727580475,
+        "raw_chrF": 80.95142559981518,
+        "hybrid_chrF": 80.95142559981518
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 595,
+      "category": "overcorrection_prevented",
+      "source": "As knowledge of Greek declined, the West found itself cut off from its Greek philosophical and scientific roots.",
+      "reference": "जैसे-जैसे ग्रीक का ज्ञान घटता गया, पश्चिम ने खुद को अपनी ग्रीक दार्शनिक और वैज्ञानिक जड़ों से कटा हुआ पाया.",
+      "mBART": "जैसे-जैसे ग्रीक का ज्ञान घटता गया, पश्चिम अपने ग्रीक दार्शनिक और वैज्ञानिक मूलों से अलग हो गया।",
+      "Llama_ZS": "जैसे ही यूनानी ज्ञान में गिरावट आई, पश्चिम ने खुद को अपनी यूनानी दार्शनिक और वैज्ञानिक जड़ों से कटा हुआ पाया।",
+      "Llama_Direct": "जबकि यूनानी ज्ञान के पतन के साथ, पश्चिम अपने यूनानी दार्शनिक और वैज्ञानिक मूल से खुद को अलग पाया.",
+      "EchoRefine_Raw": "जैसे ही ग्रीक के ज्ञान में कमी आई, पश्चिम अपने ग्रीक दर्शनशास्त्र और विज्ञान के मूलों से अलग हो गया.",
+      "EchoRefine_Hybrid": "जैसे-जैसे ग्रीक का ज्ञान घटता गया, पश्चिम अपने ग्रीक दार्शनिक और वैज्ञानिक मूलों से अलग हो गया।",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 68.94339743364993,
+        "raw_chrF": 33.83706828661625,
+        "hybrid_chrF": 68.94339743364993
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 632,
+      "category": "anchor_bias_candidate",
+      "source": "Vatican City uses Italian in its legislation and official communications.",
+      "reference": "वैटिकन सिटी अपने कानूनी और आधिकारिक संचार में इतालवी का उपयोग करता है।",
+      "mBART": "वैटीकन सिटी अपने विधानों और सरकारी संचारों में इतालवी भाषा का प्रयोग करता है।",
+      "Llama_ZS": "वैटिकन सिटी अपने कानून और आधिकारिक संचार में इतालवी का उपयोग करता है।",
+      "Llama_Direct": "वेटिकन सिटी अपने कानून और आधिकारिक संचार में इतालवी का उपयोग करता है.",
+      "EchoRefine_Raw": "वैटिकन सिटी अपने कानून और आधिकारिक संचार में इतालवी का उपयोग करता है.",
+      "EchoRefine_Hybrid": "वैटीकन सिटी अपने विधानों और सरकारी संचारों में इतालवी भाषा का प्रयोग करता है।",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 49.38131299783132,
+        "raw_chrF": 92.12127443722243,
+        "hybrid_chrF": 49.38131299783132
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  },
+  "fra": {
+    "accepted_refinement": {
+      "idx": 369,
+      "category": "accepted_refinement",
+      "source": "Ocelots like to eat small animals. They will catch monkeys, snakes, rodents and birds if they can. Almost all of the animals that the ocelot hunts are far smaller than it is.",
+      "reference": "Les ocelots sont friands de petits animaux. Ils attrapent des singes, des serpents, des rongeurs et des oiseaux s'ils le peuvent. Presque tous les animaux que l'ocelot chasse sont bien plus petits que lui.",
+      "mBART": "Les océlots aiment manger de petits animaux, ils capturent les apes, les serpents, les rongeurs et les oiseaux s'ils peuvent.",
+      "Llama_ZS": "Les ocelots aiment manger de petits animaux. Ils attraperont des singes, des serpents, des rongeurs et des oiseaux s'ils le peuvent. Presque tous les animaux que chasse l'ocelot sont beaucoup plus petits que lui.",
+      "Llama_Direct": "Les ocelots aiment manger de petits animaux. Ils attraperont des singes, des serpents, des rongeurs et des oiseaux s'ils le peuvent. Presque tous les animaux que la chasse de l'ocelot sont loin plus petit qu'il est.",
+      "EchoRefine_Raw": "Les ocelots aiment manger de petits animaux. Ils attraperont des singes, des serpents, des rongeurs et des oiseaux s'ils le peuvent. Presque tous les animaux que l'ocelot chasse sont bien plus petits qu'il.",
+      "EchoRefine_Hybrid": "Les ocelots aiment manger de petits animaux. Ils attraperont des singes, des serpents, des rongeurs et des oiseaux s'ils le peuvent. Presque tous les animaux que l'ocelot chasse sont bien plus petits qu'il.",
+      "winner": "LLM",
+      "scores": {
+        "mBART_chrF": 39.615791511798896,
+        "raw_chrF": 89.03086122333468,
+        "hybrid_chrF": 89.03086122333468
+      },
+      "error_analysis": "The QE gate accepted the MBR-selected refinement; sentence-level chrF suggests the accepted edit moved closer to the reference."
+    },
+    "overcorrection_prevented": {
+      "idx": 899,
+      "category": "overcorrection_prevented",
+      "source": "You can see the pyramids in the dark and you can see them in silence before the show begins.",
+      "reference": "Vous pouvez voir les pyramides dans l'obscurité et vous pouvez les voir en silence avant le début du spectacle.",
+      "mBART": "Vous pouvez voir les pyramides dans l'obscurité et vous pouvez les voir en silence avant le début du spectacle.",
+      "Llama_ZS": "Vous pouvez voir les pyramides dans le noir et vous pouvez les voir dans le silence avant que le spectacle ne commence.\n\nOr, in a more natural French translation:\n\nOn peut voir les pyramides dans l'obscurité et on peut les admirer dans le silence avant le début du spectacle.",
+      "Llama_Direct": "On peut voir les pyramides dans le noir et on peut les voir dans le silence avant le début du spectacle.",
+      "EchoRefine_Raw": "On peut voir les pyramides dans le noir, et on peut les voir dans le silence avant que le spectacle ne commence.",
+      "EchoRefine_Hybrid": "Vous pouvez voir les pyramides dans l'obscurité et vous pouvez les voir en silence avant le début du spectacle.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 100.0,
+        "raw_chrF": 49.30017462330289,
+        "hybrid_chrF": 100.0
+      },
+      "error_analysis": "The raw refinement drifted away from the reference under sentence-level chrF, so the QE gate retained the anchor."
+    },
+    "anchor_bias_candidate": {
+      "idx": 356,
+      "category": "anchor_bias_candidate",
+      "source": "It takes a giant rocket over a 100 feet high to put a satellite or telescope in space.",
+      "reference": "Il faut une fusée géante de plus de 30 mètres de haut pour mettre un satellite ou un télescope dans l’espace.",
+      "mBART": "Il faut une roquette géante à plus de 100 pieds de hauteur pour placer un satellite ou un télescope dans l'espace.",
+      "Llama_ZS": "Il faut une fusée géante de plus de 30 mètres de haut pour mettre un satellite ou un télescope dans l'espace.",
+      "Llama_Direct": "Il faut un énorme lanceur de plus de 30 mètres de haut pour mettre un satellite ou un télescope en orbite.",
+      "EchoRefine_Raw": "Il faut une fusée géante de plus de 30 mètres de haut pour mettre un satellite ou un télescope dans l'espace.",
+      "EchoRefine_Hybrid": "Il faut une roquette géante à plus de 100 pieds de hauteur pour placer un satellite ou un télescope dans l'espace.",
+      "winner": "mBART",
+      "scores": {
+        "mBART_chrF": 61.78432123981557,
+        "raw_chrF": 95.91317141414244,
+        "hybrid_chrF": 61.78432123981557
+      },
+      "error_analysis": "The raw refinement scored better than the anchor by sentence-level chrF, but the QE gate retained mBART; this is a candidate anchor-bias case for manual analysis."
+    }
+  }
+}

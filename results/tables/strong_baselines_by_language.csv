@@ -1,0 +1,25 @@
+system,language,model_size,BLEU,chrF,COMET
+NLLB-200 distilled,npi,600M,7.99,53.83,82.16
+NLLB-200 distilled,ben,600M,16.68,50.48,85.53
+NLLB-200 distilled,sin,600M,9.99,46.78,88.21
+NLLB-200 distilled,mya,600M,5.52,36.5,84.16
+NLLB-200 distilled,kor,600M,22.78,33.49,87.23
+NLLB-200 distilled,tam,600M,27.98,56.68,88.16
+NLLB-200 distilled,hin,600M,10.46,56.21,80.01
+NLLB-200 distilled,fra,600M,38.61,68.84,86.95
+Aya-23-35B,npi,35B,5.54,27.31,69.27
+Aya-23-35B,ben,35B,2.65,28.67,63.44
+Aya-23-35B,sin,35B,0.0,4.0,25.06
+Aya-23-35B,mya,35B,1.51,7.03,30.84
+Aya-23-35B,kor,35B,21.48,35.0,89.63
+Aya-23-35B,tam,35B,8.85,33.55,69.57
+Aya-23-35B,hin,35B,10.9,52.72,79.53
+Aya-23-35B,fra,35B,63.04,70.53,88.49
+EchoRefine Hybrid,npi,70B,8.16,50.07,81.28
+EchoRefine Hybrid,ben,70B,20.29,38.74,77.34
+EchoRefine Hybrid,sin,70B,9.51,30.13,78.75
+EchoRefine Hybrid,mya,70B,1.97,49.37,86.51
+EchoRefine Hybrid,kor,70B,11.21,31.3,88.18
+EchoRefine Hybrid,tam,70B,5.2,48.88,85.66
+EchoRefine Hybrid,hin,70B,16.12,50.88,78.97
+EchoRefine Hybrid,fra,70B,51.99,68.06,87.89
