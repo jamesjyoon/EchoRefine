@@ -1,0 +1,94 @@
+# EchoRefine ablation grid used for reviewer-requested component isolation.
+# Each non-default run writes progress/results with a config suffix so it does
+# not overwrite the completed full multilingual runs.
+
+languages:
+  - npi
+  - ben
+  - sin
+  - mya
+  - kor
+  - tam
+  - hin
+  - fra
+
+defaults:
+  evaluator: evaluate_multilingual_resumable.py
+  limit: 1012
+  batch_size: 8
+  decoding_method: mbr
+  num_candidates: 5
+  temperature: 0.6
+  gate_mode: qe
+  qe_margin: 0.0
+  use_backtranslation: true
+
+component_isolation:
+  # mBART is already produced by every run.
+  # always_llm isolates Raw/MBR-selected refinement before QE.
+  # qe isolates the full Hybrid Gatekeeper.
+  gate_modes:
+    - always_anchor
+    - always_llm
+    - qe
+  configurations:
+    - name: abl_component_no_bt
+      description: LLM refinement without back-translation, greedy decoding, no QE.
+      decoding_method: greedy
+      num_candidates: 1
+      gate_mode: always_llm
+      use_backtranslation: false
+    - name: abl_component_bt_no_mbr
+      description: Back-translation signal with greedy decoding, no MBR, no QE.
+      decoding_method: greedy
+      num_candidates: 1
+      gate_mode: always_llm
+      use_backtranslation: true
+    - name: abl_component_mbr_no_qe
+      description: Back-translation plus MBR with no QE gate.
+      decoding_method: mbr
+      num_candidates: 5
+      gate_mode: always_llm
+      use_backtranslation: true
+    - name: abl_component_full_qe
+      description: Full EchoRefine with back-translation, MBR, and QE margin 0.2.
+      decoding_method: mbr
+      num_candidates: 5
+      gate_mode: qe
+      qe_margin: 0.2
+      use_backtranslation: true
+
+decoding_methods:
+  - greedy
+  - beam_search_4
+  - beam_search_8
+  - mbr
+
+mbr_candidates:
+  - 3
+  - 5
+  - 10
+  - 20
+
+# Interpreted as the minimum CometKiwi score advantage
+# EchoRefine_Raw must have over mBART before the QE gate accepts it.
+cometkiwi_qe_margins:
+  - 0.0
+  - 0.1
+  - 0.2
+  - 0.3
+  - 0.5
+
+recommended_commands:
+  all_high_priority_dry_run: >
+    python generate_missing_experiments.py --groups high-priority --dry-run
+  all_high_priority_run: >
+    python generate_missing_experiments.py --groups high-priority --skip-existing
+  mbr_k_sweep: >
+    python generate_missing_experiments.py --groups decoding --languages fra --skip-existing
+  qe_margin_sweep: >
+    python generate_missing_experiments.py --groups thresholds --languages fra --skip-existing
+  component_ablation: >
+    python generate_missing_experiments.py --groups components --skip-existing
+  aggregate_missing_experiments: >
+    python analysis/aggregate_missing_experiments.py

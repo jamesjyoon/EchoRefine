@@ -1,7 +1,9 @@
 import os
 import torch
 import pandas as pd
+import sacrebleu
 from tqdm import tqdm
+from difflib import SequenceMatcher
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
@@ -9,6 +11,10 @@ from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 MBART_ID = "facebook/mbart-large-50-many-to-many-mmt"
 SAMPLES_PER_LANG = 1500  # 8 langs * 1500 = 12k total
 BATCH_SIZE = 32
+MIN_SOURCE_TOKENS = 3
+MAX_SOURCE_TOKENS = 128
+MAX_DRAFT_TARGET_BLEU = 95.0
+MAX_DRAFT_TARGET_CHAR_SIMILARITY = 0.98
 
 # Language Config: (OPUS_Code, mBART_Code, Language_Name)
 LANG_CONFIGS = [
@@ -36,6 +42,28 @@ def batch_translate(texts, src_lang, tgt_lang, tgt_token_id):
     with torch.no_grad():
         generated_tokens = model.generate(**inputs, forced_bos_token_id=tgt_token_id, max_length=128)
     return tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+
+def draft_target_filter(source, draft, target):
+    source_len = len(str(source).split())
+    if source_len < MIN_SOURCE_TOKENS or source_len > MAX_SOURCE_TOKENS:
+        return False, {}
+
+    draft = str(draft).strip()
+    target = str(target).strip()
+    if not draft or not target or draft == target:
+        return False, {}
+
+    sentence_bleu = sacrebleu.sentence_bleu(draft, [target]).score
+    char_similarity = SequenceMatcher(None, draft, target).ratio()
+    keep = (
+        sentence_bleu < MAX_DRAFT_TARGET_BLEU
+        and char_similarity < MAX_DRAFT_TARGET_CHAR_SIMILARITY
+    )
+    return keep, {
+        "source_length_tokens": source_len,
+        "draft_target_sentence_bleu": round(sentence_bleu, 4),
+        "draft_target_char_similarity": round(char_similarity, 4),
+    }
 
 all_data = []
 
@@ -84,15 +112,18 @@ for opus_code, mbart_code, lang_name in LANG_CONFIGS:
         # 3. Filter & Store
         for i in range(len(drafts)):
             if collected >= SAMPLES_PER_LANG: break
-            
-            # Only keep if Draft != Target (Validation: is there something to fix?)
-            if drafts[i].strip() != batch_tgt[i].strip():
+
+            # Keep only examples with a measurable draft-target gap.
+            # This avoids exact and near-identical pairs that do not exercise refinement.
+            keep, filter_stats = draft_target_filter(batch_en[i], drafts[i], batch_tgt[i])
+            if keep:
                 all_data.append({
                     "language": lang_name, # Vital for the system prompt
                     "source": batch_en[i],
                     "draft": drafts[i],
                     "back_trans": back_trans[i],
-                    "target": batch_tgt[i]
+                    "target": batch_tgt[i],
+                    **filter_stats,
                 })
                 collected += 1
                 pbar.update(1)
@@ -100,4 +131,5 @@ for opus_code, mbart_code, lang_name in LANG_CONFIGS:
 # --- Save Combined Dataset ---
 df = pd.DataFrame(all_data)
 df.to_csv("train_data_multilingual.csv", index=False)
+df.groupby("language").size().rename("count").to_csv("train_data_multilingual_counts.csv")
 print(f"\nSaved {len(df)} samples to train_data_multilingual.csv")

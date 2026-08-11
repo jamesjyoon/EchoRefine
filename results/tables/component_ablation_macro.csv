@@ -1,0 +1,6 @@
+component_configuration,BLEU,chrF,COMET
++ Back-translation Signal,18.3088,41.635,78.0087
++ LLM Refinement (no BT),18.5225,41.8875,78.2012
++ MBR (k=5),17.94,40.6388,77.4538
++ QE Gate (Hybrid),15.5562,45.9288,83.0725
+mBART Anchor,14.8575,43.5488,78.7475

@@ -1,0 +1,59 @@
+{
+  "dataset_path": "train_data_multilingual.csv",
+  "num_examples": 12000,
+  "language_counts": {
+    "Nepali": 1500,
+    "Sinhala": 1500,
+    "Burmese": 1500,
+    "Tamil": 1500,
+    "Bengali": 1500,
+    "Hindi": 1500,
+    "Korean": 1500,
+    "French": 1500
+  },
+  "source_length_tokens": {
+    "mean": 8.6344,
+    "std": 12.0468,
+    "p05": 1.0,
+    "p25": 2.0,
+    "p50": 4.0,
+    "p75": 9.0,
+    "p95": 33.0
+  },
+  "target_length_tokens": {
+    "mean": 8.5488,
+    "std": 13.4116,
+    "p05": 1.0,
+    "p25": 2.0,
+    "p50": 4.0,
+    "p75": 8.0,
+    "p95": 34.0
+  },
+  "normalized_draft_target_edit_distance": {
+    "mean": 0.8119,
+    "std": 0.233,
+    "p05": 0.3333,
+    "p25": 0.6667,
+    "p50": 0.9091,
+    "p75": 1.0,
+    "p95": 1.0
+  },
+  "backtranslation_source_similarity": {
+    "mean": 0.715,
+    "std": 0.2499,
+    "p05": 0.2222,
+    "p25": 0.5556,
+    "p50": 0.7586,
+    "p75": 0.9333,
+    "p95": 1.0
+  },
+  "error_type_counts": {
+    "length_shift": 5367,
+    "major_rewrite": 5287,
+    "lexical_or_morphological_edit": 1136,
+    "source_copy": 209,
+    "near_duplicate": 1
+  },
+  "draft_target_exact_duplicates": 0,
+  "draft_target_near_duplicates_ed_le_0p05": 1
+}

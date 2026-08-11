@@ -37,13 +37,13 @@ mkdir -p "$PROJECT_DIR/logs" "$HF_HOME" "$TMPDIR"
 echo "Starting job on $(hostname) at $(date)"
 
 # --- STEP 1: GENERATE DATA ---
-echo ">>> STAGE 1: Generating 10k Synthetic Samples..."
-time $PYTHON_BIN generate_multilingual_data.py
+# echo ">>> STAGE 1: Generating 10k Synthetic Samples..."
+# time $PYTHON_BIN generate_multilingual_data.py
 
-if [ $? -ne 0 ]; then
-    echo "CRITICAL: Data generation failed. Exiting."
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "CRITICAL: Data generation failed. Exiting."
+#     exit 1
+# fi
 
 # --- STEP 2a: TRAIN REFINEMENT ADAPTER ---
 # echo ">>> STAGE 2a: Starting QLoRA Fine-Tuning (Refinement)..."
@@ -55,14 +55,14 @@ fi
 # fi
 
 # --- STEP 2b: TRAIN DIRECT ADAPTER ---
-echo ">>> STAGE 2b: Starting QLoRA Fine-Tuning (Direct Translation)..."
-# Note: VRAM is cleared automatically between python calls
-time $PYTHON_BIN train_direct.py
+# echo ">>> STAGE 2b: Starting QLoRA Fine-Tuning (Direct Translation)..."
+# # Note: VRAM is cleared automatically between python calls
+# time $PYTHON_BIN train_direct.py
 
-if [ $? -ne 0 ]; then
-    echo "CRITICAL: Direct training failed. Exiting."
-    exit 1
-fi
+# if [ $? -ne 0 ]; then
+#     echo "CRITICAL: Direct training failed. Exiting."
+#     exit 1
+# fi
 
 # --- STEP 3: EVALUATION ---
 echo ">>> STAGE 3: Running Multilingual Benchmarks..."
@@ -74,7 +74,7 @@ for lang in $LANGUAGES; do
     echo ">>> Evaluating Language: $lang"
     echo "------------------------------------------------"
     
-    time $PYTHON_BIN evaluate_multilingual_resumable.py --lang $lang --limit 10
+    time $PYTHON_BIN evaluate_multilingual_resumable.py --lang $lang --limit 1012
     
     if [ $? -ne 0 ]; then
         echo "Warning: Evaluation for $lang failed or timed out."
